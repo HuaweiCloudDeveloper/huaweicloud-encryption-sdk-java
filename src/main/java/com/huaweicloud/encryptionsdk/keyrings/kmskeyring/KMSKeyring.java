@@ -141,7 +141,7 @@ public abstract class KMSKeyring implements Keyring {
         return kmsClient.encryptDatakey(encryptDataRequest);
     }
 
-    private String getKeySqpec(KmsClient kmsClient,String keyId){
+    private String getKeySqpec(KmsClient kmsClient, String keyId) {
         ListKeyDetailRequest request = new ListKeyDetailRequest().withBody(new OperateKeyRequestBody().withKeyId(keyId));
         ListKeyDetailResponse response = kmsClient.listKeyDetail(request);
         return response.getKeyInfo().getKeySpec().getValue();
