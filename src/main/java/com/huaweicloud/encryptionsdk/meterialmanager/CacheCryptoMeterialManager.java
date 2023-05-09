@@ -41,6 +41,7 @@ public class CacheCryptoMeterialManager implements CryptoMeterialManager {
      */
     private static final String CACHE_ID_ALGORITHM_SHA = "SHA-256";
     private static final String CACHE_ID_ALGORITHM_SM3 = "SM3";
+
     /**
      * 数据密钥最大加密数据条数
      */

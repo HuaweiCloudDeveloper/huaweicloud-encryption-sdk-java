@@ -13,10 +13,12 @@ public class KMSConfig {
      * 主密钥id
      */
     private String keyId;
+
     /**
      * 项目id
      */
     private String projectId;
+
     /**
      * 节点域名
      */

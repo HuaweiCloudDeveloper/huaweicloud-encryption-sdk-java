@@ -235,11 +235,11 @@ public class LocalDataKeyCache implements DataKeyCache {
             removeEntry(oldEntry);
         }
         treeSet.add(entry);
-        //淘汰过期条目
+        // 淘汰过期条目
         while (!treeSet.isEmpty() && treeSet.first().expireTimeStamp < System.currentTimeMillis()) {
             removeEntry(treeSet.first());
         }
-        //检查是否超出上限
+        // 检查是否超出上限
         checkCapacity();
     }
 
