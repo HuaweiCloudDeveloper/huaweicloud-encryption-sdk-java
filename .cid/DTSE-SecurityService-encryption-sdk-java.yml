@@ -17,7 +17,7 @@ machine:
     
 #  构建脚本
 scripts:
-  - sh build.sh
+  - sh .build_config/EncryptionSDK/build.sh #  请修改成业务使用的构建脚本文件相对路径
   
 #  构建产物
 artifacts:
