@@ -41,7 +41,6 @@ public class KmsDataKeyGenerate implements DataKeyGenerate {
                     .withSk(huaweiConfig.getSk())
                     .withProjectId(kmsConfig.getProjectId());
             CreateDatakeyResponse response = createDataKeyByKms(kmsConfig.getRegion(), kmsConfig.getKeyId(), kmsConfig.getEndPoint(), auth, huaweiConfig.getCryptoAlgorithm());
-            //byte[] plaintBytes = Base64.getDecoder().decode(response.getPlainText());
             byte[] plaintBytes;
             try {
                 plaintBytes = Utils.hexToBytes(response.getPlainText());

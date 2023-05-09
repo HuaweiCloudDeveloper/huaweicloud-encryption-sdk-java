@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.crypto.SecretKey;
 import java.math.BigInteger;
-import java.util.Base64;
 import java.util.List;
 
 /**

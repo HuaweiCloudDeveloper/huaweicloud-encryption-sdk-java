@@ -1,6 +1,5 @@
 package com.huaweicloud.encryptionsdk.handler;
 
-import com.huaweicloud.encryptionsdk.model.CipherHeader;
 import com.huaweicloud.encryptionsdk.model.DataMaterials;
 
 /**

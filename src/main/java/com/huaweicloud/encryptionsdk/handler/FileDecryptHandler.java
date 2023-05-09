@@ -22,6 +22,7 @@ public class FileDecryptHandler {
     private CryptoAlgorithm algorithm;
 
     private SecretKey secretKey;
+    
     /**
      * 未解析的byte数组
      */
