@@ -46,7 +46,6 @@ public class LocalDataKeyMaterialCacheTest {
     private Keyring keyring;
 
     private DataKeyMaterials dataKeyMaterials = new DataKeyMaterials();
-    ;
 
     private Map<String, String> encryptionContext = new HashMap<>();
 

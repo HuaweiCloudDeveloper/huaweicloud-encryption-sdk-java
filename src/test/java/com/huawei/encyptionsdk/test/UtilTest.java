@@ -37,7 +37,7 @@ public class UtilTest {
 
     @Test
     public void Should_ok_When_LongToByteTest() {
-        long num = 1l;
+        long num = 1L;
         byte[] bytes = Utils.longToByte(num);
         long l = Utils.byteToLong(bytes);
         assertEquals(num, l);
@@ -45,11 +45,11 @@ public class UtilTest {
 
     @Test
     public void Should_ok_When_AddPreventOverFlowTest() {
-        long num = 1l;
-        long num1 = 2l;
+        long num = 1L;
+        long num1 = 2L;
         long numMax = Long.MAX_VALUE;
         long numMin = Long.MIN_VALUE;
-        long num4 = -1l;
+        long num4 = -1L;
 
         long result = Utils.addPreventOverFlow(num, num1);
         assertEquals(result, num + num1);
