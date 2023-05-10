@@ -29,10 +29,12 @@ public abstract class RawKeyring implements Keyring {
      * 非对称密钥私钥路径
      */
     private final List<byte[]> privateKey = new ArrayList<>();
+
     /**
      * 非对称密钥公钥路径
      */
     private final List<byte[]> publicKey = new ArrayList<>();
+
     /**
      * 对称密钥路径
      */
