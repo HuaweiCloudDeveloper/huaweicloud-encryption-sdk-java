@@ -15,10 +15,7 @@ import java.util.Base64;
 import java.util.Collections;
 
 /**
- * @author zc
- * @ClassName DataKeyGenerateTest
- * @description:
- * @datetime 2022年 09月 19日 14:14
+ * DataKeyGenerateTest
  */
 public class DataKeyGenerateTest {
     private static final String ACCESS_KEY = "WN0ETTDULCBZDCPDMBR8";
