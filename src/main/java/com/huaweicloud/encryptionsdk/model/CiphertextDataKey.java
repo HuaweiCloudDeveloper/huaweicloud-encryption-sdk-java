@@ -56,7 +56,7 @@ public class CiphertextDataKey {
 
         /**
          * 总长度包括各类信息数组的长度和长度数字对应的字节数，
-         *如datakey数组和dataKeyLength对应的short数字的转换成的字节数组
+         * 如datakey数组和dataKeyLength对应的short数字的转换成的字节数组
          * 用于反序列化时，根据dataKeyLength确定dataKey的数组长度
          * 其中dataKeyLength为short，占2个字节，keyInformationLength和keyProviderLength
          * 为byte，占一个字节，固需要在最后加4个byte长度

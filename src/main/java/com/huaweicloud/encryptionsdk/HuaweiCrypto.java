@@ -1,6 +1,5 @@
 package com.huaweicloud.encryptionsdk;
 
-
 import com.huaweicloud.encryptionsdk.exception.ErrorMessage;
 import com.huaweicloud.encryptionsdk.exception.HuaweicloudException;
 import com.huaweicloud.encryptionsdk.exception.KeyringNotFoundException;
@@ -16,7 +15,6 @@ import com.huaweicloud.encryptionsdk.model.CryptoResult;
 import com.huaweicloud.encryptionsdk.model.DataKeyMaterials;
 import com.huaweicloud.encryptionsdk.model.request.EncryptRequest;
 import org.apache.commons.codec.DecoderException;
-
 
 import java.io.IOException;
 import java.io.InputStream;
