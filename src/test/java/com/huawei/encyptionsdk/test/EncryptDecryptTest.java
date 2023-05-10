@@ -20,10 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
- * @author zc
- * @ClassName EncryptDecryptTest
- * @description:
- * @datetime 2022年 09月 16日 14:58
+ * EncryptDecryptTest
  */
 public class EncryptDecryptTest {
     public static final String ACCESS_KEY = "WN0ETTDULCBZDCPDMBR8";

@@ -22,10 +22,7 @@ import java.util.Base64;
 import java.util.Collections;
 
 /**
- * @author zc
- * @ClassName RawAesKeyringTest
- * @description:
- * @datetime 2022年 09月 08日 16:23
+ * RawAesKeyringTest
  */
 public class RawSm2KeyringTest {
     @Test

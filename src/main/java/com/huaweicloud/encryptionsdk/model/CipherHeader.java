@@ -26,8 +26,7 @@ import java.util.Map;
 
 
 /**
- * @ClassName CipherHeader
- * @description:
+ * CipherHeader
  */
 public class CipherHeader {
 

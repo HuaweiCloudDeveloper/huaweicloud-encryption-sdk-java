@@ -14,10 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * @author zc
- * @ClassName KeyringFactoryTest
- * @description:
- * @datetime 2022年 09月 08日 14:28
+ * KeyringFactoryTest
  */
 public class KeyringFactoryTest {
 

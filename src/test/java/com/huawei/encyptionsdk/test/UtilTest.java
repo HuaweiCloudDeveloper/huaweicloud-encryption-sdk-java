@@ -9,10 +9,7 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 /**
- * @author zc
- * @ClassName Uti
- * @description:
- * @datetime 2022年 09月 27日 11:17
+ * UtilTest
  */
 public class UtilTest {
 
