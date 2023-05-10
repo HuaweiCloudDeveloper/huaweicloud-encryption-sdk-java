@@ -21,40 +21,40 @@ import java.util.Map;
 public class FileEncryptionExample {
 
     public static void main(String[] args) throws IOException {
-        //初始化加解密相关配置及加密算法
+        // 初始化加解密相关配置及加密算法
         HuaweiConfig huaweiConfig = HuaweiConfig.builder()
                 .buildCryptoAlgorithm(CryptoAlgorithm.AES_256_GCM_NOPADDING)
                 .build();
         /*
-        *读取密钥保存在文件中的一到多个密钥，也可通过String类型密钥字符串getByte()获取，列如
-            String symemetryKey1 = "I+BmZXZEftgtsDfs5YNnUg==";
-            String symemetryKey2 = "fdashkjsalhfkdsahfsdkj==";
-            ArrayList<byte[]> bytes = new ArrayList<>();
-            bytes.add(Base64.getDecoder().decode(symemetryKey1.getBytes(StandardCharsets.UTF_8)));
-            bytes.add(Base64.getDecoder().decode(symemetryKey2.getBytes(StandardCharsets.UTF_8)));
-            keyring.setSymmetricKey(bytes);
+        * 读取密钥保存在文件中的一到多个密钥，也可通过String类型密钥字符串getByte()获取，列如
+        * String symemetryKey1 = "I+BmZXZEftgtsDfs5YNnUg==";
+        * String symemetryKey2 = "fdashkjsalhfkdsahfsdkj==";
+        * ArrayList<byte[]> bytes = new ArrayList<>();
+        * bytes.add(Base64.getDecoder().decode(symemetryKey1.getBytes(StandardCharsets.UTF_8)));
+        * bytes.add(Base64.getDecoder().decode(symemetryKey2.getBytes(StandardCharsets.UTF_8)));
+        * keyring.setSymmetricKey(bytes);
         * */
         RawKeyring keyring = new RawKeyringFactory().getKeyring(KeyringTypeEnum.RAW_AES.getType());
         keyring.setSymmetricKey(Utils.readMasterKey(Collections.singletonList("src/256bit")));
-        //初始化加密入口
+        // 初始化加密入口
         HuaweiCrypto huaweiCrypto = new HuaweiCrypto(huaweiConfig).withKeyring(keyring);
-        //加解密上下文
+        // 加解密上下文
         Map<String, String> map = new HashMap<>();
         map.put("key", "value");
         map.put("context", "encrypt");
-        //fileInputStream 源文件对应的输入流
-        //fileOutputStream 加密后文件对应的输出流
+        // fileInputStream 源文件对应的输入流
+        // fileOutputStream 加密后文件对应的输出流
         try (FileInputStream fileInputStream = new FileInputStream("src/test.pptx");
              FileOutputStream fileOutputStream = new FileOutputStream("src/test.encrypted.pptx");) {
-            //加密
+            // 加密
             huaweiCrypto.encrypt(fileInputStream, fileOutputStream, map);
         } catch (Exception e) {
         }
-        //fileInputStream 加密后文件对应的输入流
-        //fileOutputStream 源文件对应的输出流
+        // fileInputStream 加密后文件对应的输入流
+        // fileOutputStream 源文件对应的输出流
         try (FileInputStream in = new FileInputStream("src/test.encrypted.pptx");
              FileOutputStream out = new FileOutputStream("src/test.decrypted.pptx");) {
-            //解密
+            // 解密
             huaweiCrypto.decrypt(in, out);
         } catch (Exception e) {
         }

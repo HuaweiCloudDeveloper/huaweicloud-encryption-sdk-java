@@ -28,7 +28,7 @@ public class EncryptDecryptTest {
     public static final String PROJECT_ID = "7c55d8e5238d42e49fd9ce11b24b035b";
     public static final String REGION = "cn-north-7";
     public static final String KEYID = "aac33b45-d65e-49ea-82c3-e6f5c552dbc5";
-    public static final String END_POINT = "https://kms.cn-north-7.myhuaweicloud.com";
+    public static final String END_POINT = "https:// kms.cn-north-7.myhuaweicloud.com";
 
     public static final String PROJECT_ID1 = "7c55d8e5238d42e49fd9ce11b24b035b";
     public static final String REGION1 = "cn-north-74";
@@ -56,7 +56,7 @@ public class EncryptDecryptTest {
         System.out.println(new String(decrypt1.getResult()));
 
 
-        //discover 解密
+        // discover 解密
         HuaweiConfig huaweiConfigDecrypt = HuaweiConfig.builder().buildSk(SECRET_ACCESS_KEY)
                 .buildAk(ACCESS_KEY).build();
         KMSKeyring keyringDecrypt = new KmsKeyringFactory().getKeyring(KeyringTypeEnum.KMS_DISCOVERY.getType());
@@ -87,7 +87,7 @@ public class EncryptDecryptTest {
         System.out.println(new String(decrypt1.getResult()));
 
 
-        //discover 解密
+        // discover 解密
         HuaweiConfig multiDecryptConfig = HuaweiConfig.builder().buildSk(SECRET_ACCESS_KEY)
                 .buildAk(ACCESS_KEY)
                 .buildKmsConfig(Collections.singletonList(new KMSConfig(REGION1, KEYID1, PROJECT_ID1)))
@@ -115,7 +115,7 @@ public class EncryptDecryptTest {
         CryptoResult<byte[]> result = huaweiCrypto.encrypt(new EncryptRequest(map, PLAIN_TEXT.getBytes(StandardCharsets.UTF_8)));
         CryptoResult<byte[]> decrypt = huaweiCrypto.decrypt(result.getResult());
         System.out.println(new String(decrypt.getResult()));
-        //解密
+        // 解密
         Assert.assertEquals(new String(decrypt.getResult()), PLAIN_TEXT);
     }
 
@@ -134,7 +134,7 @@ public class EncryptDecryptTest {
         CryptoResult<byte[]> result = huaweiCrypto.encrypt(new EncryptRequest(map, PLAIN_TEXT.getBytes(StandardCharsets.UTF_8)));
         CryptoResult<byte[]> decrypt = huaweiCrypto.decrypt(result.getResult());
         System.out.println(new String(decrypt.getResult()));
-        //解密
+        // 解密
         Assert.assertEquals(new String(decrypt.getResult()), PLAIN_TEXT);
     }
 
@@ -153,7 +153,7 @@ public class EncryptDecryptTest {
         CryptoResult<byte[]> result = huaweiCrypto.encrypt(new EncryptRequest(map, PLAIN_TEXT.getBytes(StandardCharsets.UTF_8)));
         CryptoResult<byte[]> decrypt = huaweiCrypto.decrypt(result.getResult());
         System.out.println(new String(decrypt.getResult()));
-        //解密
+        // 解密
         Assert.assertEquals(new String(decrypt.getResult()), PLAIN_TEXT);
     }
 
@@ -173,7 +173,7 @@ public class EncryptDecryptTest {
         CryptoResult<byte[]> result = huaweiCrypto.encrypt(new EncryptRequest(map, PLAIN_TEXT.getBytes(StandardCharsets.UTF_8)));
         CryptoResult<byte[]> decrypt = huaweiCrypto.decrypt(result.getResult());
         System.out.println(new String(decrypt.getResult()));
-        //解密
+        // 解密
         Assert.assertEquals(new String(decrypt.getResult()), PLAIN_TEXT);
     }
 
@@ -193,7 +193,7 @@ public class EncryptDecryptTest {
         CryptoResult<byte[]> result = huaweiCrypto.encrypt(new EncryptRequest(map, PLAIN_TEXT.getBytes(StandardCharsets.UTF_8)));
         CryptoResult<byte[]> decrypt = huaweiCrypto.decrypt(result.getResult());
         System.out.println(new String(decrypt.getResult()));
-        //解密
+        // 解密
         Assert.assertEquals(new String(decrypt.getResult()), PLAIN_TEXT);
     }
 

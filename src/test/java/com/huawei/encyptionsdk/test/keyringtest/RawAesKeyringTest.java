@@ -33,7 +33,7 @@ public class RawAesKeyringTest {
         byte[] decode = Base64.getDecoder().decode(dataKey);
         dataKeyMaterials.setPlaintextDataKey(new SecretKeySpec(decode, 0, decode.length, "AES"));
         HashMap<String, String> map = new HashMap<>();
-       // map.put("1", "2");
+        // map.put("1", "2");
         dataKeyMaterials.setEncryptionContexts(map);
         RawKeyringFactory rawKeyringFactory = new RawKeyringFactory();
         RawKeyring keyring = rawKeyringFactory.getKeyring("aes");
@@ -41,7 +41,7 @@ public class RawAesKeyringTest {
         dataKeyMaterials.setCryptoAlgorithm(CryptoAlgorithm.AES_128_GCM_NOPADDING);
         keyring.encryptDataKey(dataKeyMaterials);
         System.out.println(Utils.bytesToHex(dataKeyMaterials.getCiphertextDataKeys().get(0).getDataKey()));
-        //System.out.println(Base64.getEncoder().encodeToString(dataKeyMaterials.getCiphertextDataKeys().get(1).getDataKey()));
+        // System.out.println(Base64.getEncoder().encodeToString(dataKeyMaterials.getCiphertextDataKeys().get(1).getDataKey()));
         dataKeyMaterials.setPlaintextDataKey(null);
         keyring.decryptDataKey(dataKeyMaterials);
         SecretKey plaintextDataKey = dataKeyMaterials.getPlaintextDataKey();
