@@ -1,6 +1,5 @@
 package com.huaweicloud.encryptionsdk.exception;
 
-
 public class CipherDataException extends HuaweicloudException {
 
     public CipherDataException() {

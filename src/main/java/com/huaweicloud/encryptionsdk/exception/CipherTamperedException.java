@@ -1,6 +1,5 @@
 package com.huaweicloud.encryptionsdk.exception;
 
-
 public class CipherTamperedException extends HuaweicloudException {
     public CipherTamperedException() {
         super();
