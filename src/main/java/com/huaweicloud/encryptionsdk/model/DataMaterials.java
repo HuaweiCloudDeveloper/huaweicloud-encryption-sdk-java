@@ -2,10 +2,7 @@ package com.huaweicloud.encryptionsdk.model;
 
 
 /**
- * @author zc
- * @ClassName DataMaterials
- * @description:
- * @datetime 2022年 09月 15日 10:32
+ * DataMaterials
  */
 public class DataMaterials {
     private CipherBody cipherBody;
