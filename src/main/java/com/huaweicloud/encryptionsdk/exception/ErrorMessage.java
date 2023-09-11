@@ -1,6 +1,5 @@
 package com.huaweicloud.encryptionsdk.exception;
 
-
 /**
  * @description: 错误信息
  */
@@ -29,12 +28,13 @@ public enum ErrorMessage {
     NOT_FOUND_CIPHER_TEXT_DATA_KEY(1021, "cipher header may be changed,the count of data key should not less than 0"),
     NOT_SUPPORT_DISCOVERY_DECRYPT(1022, "the cipher text not support discovery Keyring"),
     ENCRYPT_DATA_KEY_EXCEPTION(1023, "encrypt data key error,please confirm your information is right"),
-    CACHE_PARAM_LESS_THAN_ZERO(1024,"the param of cache should not less than 0!"),
-    MASTER_KEY_SHOULD_NOT_NULL(1025,"Master Key should not null"),
+    CACHE_PARAM_LESS_THAN_ZERO(1024, "the param of cache should not less than 0!"),
+    MASTER_KEY_SHOULD_NOT_NULL(1025, "Master Key should not null"),
+    SOURCE_FILE_INVALID(1026, "The length of the source file is insufficient."),
     ;
 
-
     private String message;
+
     private int code;
 
     ErrorMessage(int code, String message) {

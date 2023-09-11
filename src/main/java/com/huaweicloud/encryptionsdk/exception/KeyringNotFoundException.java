@@ -1,6 +1,5 @@
 package com.huaweicloud.encryptionsdk.exception;
 
-
 public class KeyringNotFoundException extends HuaweicloudException {
 
     public KeyringNotFoundException() {

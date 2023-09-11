@@ -1,6 +1,5 @@
 package com.huaweicloud.encryptionsdk.model;
 
-
 public class CryptoResult<T> {
 
     private T result;

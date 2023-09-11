@@ -1,4 +1,3 @@
-
 package com.huaweicloud.encryptionsdk.keyrings;
 
 import com.huaweicloud.encryptionsdk.model.DataKeyMaterials;
@@ -6,7 +5,6 @@ import org.apache.commons.codec.DecoderException;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
-
 
 /**
  * Keyring is used to generate, encrypt and decrypt data keys.
@@ -19,7 +17,8 @@ public interface Keyring {
      * @param dataKeyMaterials Data key materials needed for encryption.
      * @return Data key materials with encrypted data key added.
      */
-    DataKeyMaterials encryptDataKey(DataKeyMaterials dataKeyMaterials) throws IOException, ExecutionException, InterruptedException, DecoderException;
+    DataKeyMaterials encryptDataKey(DataKeyMaterials dataKeyMaterials)
+        throws IOException, ExecutionException, InterruptedException, DecoderException;
 
     /**
      * Decrypt the cipher data keys

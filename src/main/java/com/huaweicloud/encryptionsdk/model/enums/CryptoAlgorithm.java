@@ -3,7 +3,6 @@
 
 package com.huaweicloud.encryptionsdk.model.enums;
 
-
 import com.huaweicloud.encryptionsdk.common.Constants;
 
 /**
@@ -30,17 +29,24 @@ public enum CryptoAlgorithm {
     SM4_128_CBC_PADDING("SM4_128", "SM4/CBC/PKCS5Padding", 16, 16, 16, 16, (short) 4, (byte) 1),
     ;
 
-
     private byte version;
+
     private String keySpec;
+
     private String cryptoAlg;
+
     private int keyLen;
+
     private int ivLen;
+
     private int tagLen;
+
     private int blockSize;
+
     private short value;
 
-    CryptoAlgorithm(String keySpec, String cryptoAlg, int keyLen, int ivLen, int tagLen, int blockSize, short value, byte version) {
+    CryptoAlgorithm(String keySpec, String cryptoAlg, int keyLen, int ivLen, int tagLen, int blockSize, short value,
+        byte version) {
         this.keySpec = keySpec;
         this.cryptoAlg = cryptoAlg;
         this.keyLen = keyLen;
@@ -60,11 +66,9 @@ public enum CryptoAlgorithm {
         return null;
     }
 
-
     public String getAlgorithmName() {
         return this.keySpec.split(Constants.KEY_SPEC_DELIMITER)[0];
     }
-
 
     public byte getVersion() {
         return version;

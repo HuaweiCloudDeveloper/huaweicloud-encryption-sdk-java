@@ -25,7 +25,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
-import java.util.*;
+import java.util.Base64;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -33,13 +36,13 @@ import java.util.concurrent.ExecutionException;
  */
 public class CacheCryptoMeterialManager implements CryptoMeterialManager {
 
-
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheCryptoMeterialManager.class);
 
     /**
      * cacheId摘要计算算法
      */
     private static final String CACHE_ID_ALGORITHM_SHA = "SHA-256";
+
     private static final String CACHE_ID_ALGORITHM_SM3 = "SM3";
 
     /**
@@ -57,6 +60,7 @@ public class CacheCryptoMeterialManager implements CryptoMeterialManager {
     private HuaweiConfig huaweiConfig;
 
     private long maxByteLimit;
+
     private final DataKeyCache cache;
 
     private CryptoMeterialManager cryptoMeterialManager;
@@ -98,7 +102,9 @@ public class CacheCryptoMeterialManager implements CryptoMeterialManager {
     }
 
     @Override
-    public DataKeyMaterials getMaterialsForEncrypt(Keyring keyring, DataKeyMaterials dataKeyMaterials, long plaintTextLength) throws NoSuchAlgorithmException, DecoderException, IOException, ExecutionException, InterruptedException {
+    public DataKeyMaterials getMaterialsForEncrypt(Keyring keyring, DataKeyMaterials dataKeyMaterials,
+        long plaintTextLength)
+        throws NoSuchAlgorithmException, DecoderException, IOException, ExecutionException, InterruptedException {
         String cacheId = getCacheId(dataKeyMaterials);
         DataKeyCache.UsageStatus usageStatus = new DataKeyCache.UsageStatus(plaintTextLength, Constants.NUM_1);
         DataKeyCache.EncryptCacheEntry entryForEncrypt = cache.getEntryForEncrypt(cacheId, usageStatus);
@@ -120,7 +126,8 @@ public class CacheCryptoMeterialManager implements CryptoMeterialManager {
     private String getCacheId(DataKeyMaterials dataKeyMaterials) {
         MessageDigest digest = null;
         try {
-            if (dataKeyMaterials.getCryptoAlgorithm() == CryptoAlgorithm.SM4_128_GCM_NOPADDING || dataKeyMaterials.getCryptoAlgorithm() == CryptoAlgorithm.SM4_128_CBC_PADDING) {
+            if (dataKeyMaterials.getCryptoAlgorithm() == CryptoAlgorithm.SM4_128_GCM_NOPADDING
+                || dataKeyMaterials.getCryptoAlgorithm() == CryptoAlgorithm.SM4_128_CBC_PADDING) {
                 Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
                 digest = MessageDigest.getInstance(CACHE_ID_ALGORITHM_SM3, BouncyCastleProvider.PROVIDER_NAME);
             } else {
@@ -153,15 +160,16 @@ public class CacheCryptoMeterialManager implements CryptoMeterialManager {
     }
 
     private boolean checkExceedLImit(DataKeyCache.UsageStatus usageStatusNew) {
-        return usageStatusNew.getBytesEncryptCount() <= maxByteLimit && usageStatusNew.getMessageEncryptCount() <= maxMessageLimit;
+        return usageStatusNew.getBytesEncryptCount() <= maxByteLimit
+            && usageStatusNew.getMessageEncryptCount() <= maxMessageLimit;
     }
-
 
     @Override
     public DataKeyMaterials getMaterialsForDecrypt(Keyring keyring, byte[] cipherText) throws IOException {
         DataMaterials dataMaterials = new DefaultSerializeHandler().deserialize(cipherText);
         CipherHeader headers = dataMaterials.getHeaders();
-        String cacheId = getCacheId(headers.getAlgorithm(), headers.getEncryptionContext(), headers.getCiphertextDataKeys());
+        String cacheId = getCacheId(headers.getAlgorithm(), headers.getEncryptionContext(),
+            headers.getCiphertextDataKeys());
         DataKeyCache.DecryptCacheEntry entryForDecrypt = cache.getEntryForDecrypt(cacheId);
         if (entryForDecrypt != null) {
             LOGGER.info("get decrypt dataKeyMaterials from cache success,  cacheId {}", cacheId);
@@ -180,14 +188,21 @@ public class CacheCryptoMeterialManager implements CryptoMeterialManager {
     @Override
     public DataKeyMaterials getMaterialsForStreamDecrypt(Keyring keyring, InputStream inputStream) throws IOException {
         byte[] lengthByte = new byte[Short.SIZE / Byte.SIZE];
-        inputStream.read(lengthByte);
+        int readShort = inputStream.read(lengthByte);
+        if (readShort != lengthByte.length) {
+            throw new HuaweicloudException(ErrorMessage.SOURCE_FILE_INVALID.getMessage());
+        }
         ByteBuffer buffer = ByteBuffer.allocate(lengthByte.length).put(lengthByte);
         buffer.flip();
         short length = buffer.getShort();
         byte[] bytes = new byte[length];
-        inputStream.read(bytes);
+        int read = inputStream.read(bytes);
+        if (read != bytes.length) {
+            throw new HuaweicloudException(ErrorMessage.SOURCE_FILE_INVALID.getMessage());
+        }
         DataMaterials dataMaterials = new DefaultSerializeHandler().deserialize(bytes);
-        String cacheId = getCacheId(dataMaterials.getHeaders().getAlgorithm(), dataMaterials.getHeaders().getEncryptionContext(), dataMaterials.getHeaders().getCiphertextDataKeys());
+        String cacheId = getCacheId(dataMaterials.getHeaders().getAlgorithm(),
+            dataMaterials.getHeaders().getEncryptionContext(), dataMaterials.getHeaders().getCiphertextDataKeys());
         DataKeyCache.DecryptCacheEntry entryForDecrypt = cache.getEntryForDecrypt(cacheId);
         if (entryForDecrypt != null) {
             LOGGER.info("get decrypt dataKeyMaterials from cache success,  cacheId {}", cacheId);
@@ -203,8 +218,8 @@ public class CacheCryptoMeterialManager implements CryptoMeterialManager {
         return dataKeyMaterials;
     }
 
-
-    private String getCacheId(CryptoAlgorithm algorithm, Map<String, String> encryptionContext, List<CiphertextDataKey> ciphertextDataKeys) {
+    private String getCacheId(CryptoAlgorithm algorithm, Map<String, String> encryptionContext,
+        List<CiphertextDataKey> ciphertextDataKeys) {
         MessageDigest messageDigest = null;
         try {
             if (algorithm == CryptoAlgorithm.SM4_128_GCM_NOPADDING) {

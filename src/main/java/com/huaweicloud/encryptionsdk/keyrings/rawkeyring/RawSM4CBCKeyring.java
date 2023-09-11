@@ -24,7 +24,6 @@ import java.util.List;
 public class RawSM4CBCKeyring extends RawKeyring {
     private static final Logger LOGGER = LoggerFactory.getLogger(RawSM4CBCKeyring.class);
 
-
     private static final String KEY_ALGORITHM = "SM4";
 
     static {
@@ -32,13 +31,15 @@ public class RawSM4CBCKeyring extends RawKeyring {
     }
 
     @Override
-    public void realEncrypt(byte[] bytes, List<CiphertextDataKey> ciphertextDataKeys, DataKeyMaterials dataKeyMaterials) {
+    public void realEncrypt(byte[] bytes, List<CiphertextDataKey> ciphertextDataKeys,
+        DataKeyMaterials dataKeyMaterials) {
         try {
             CryptoAlgorithm algorithm = CryptoAlgorithm.SM4_128_CBC_PADDING;
             SecretKey secretKey = new SecretKeySpec(bytes, KEY_ALGORITHM);
             CipherHandler cipherHandler = new CipherHandler(algorithm, secretKey, Cipher.ENCRYPT_MODE);
             byte[] originalDataKey = dataKeyMaterials.getPlaintextDataKey().getEncoded();
-            byte[] encryptDataKey = cipherHandler.cipherData(originalDataKey, dataKeyMaterials.getEncryptionContexts(), Constants.NUM_0, originalDataKey.length);
+            byte[] encryptDataKey = cipherHandler.cipherData(originalDataKey, dataKeyMaterials.getEncryptionContexts(),
+                Constants.NUM_0, originalDataKey.length);
             int ivLength = cipherHandler.getIv().length;
             byte[] message = new byte[ivLength + encryptDataKey.length];
             System.arraycopy(cipherHandler.getIv(), Constants.NUM_0, message, Constants.NUM_0, ivLength);
@@ -56,15 +57,19 @@ public class RawSM4CBCKeyring extends RawKeyring {
             byte[] dataKey = ciphertextDataKey.getDataKey();
             SecretKey secretKey = new SecretKeySpec(bytes, KEY_ALGORITHM);
             CipherHandler cipherHandler = new CipherHandler(algorithm, secretKey, Cipher.DECRYPT_MODE);
-            if (dataKey.length < dataKeyMaterials.getCryptoAlgorithm().getIvLen() + dataKeyMaterials.getCryptoAlgorithm().getTagLen()) {
+            if (dataKey.length
+                < dataKeyMaterials.getCryptoAlgorithm().getIvLen() + dataKeyMaterials.getCryptoAlgorithm()
+                .getTagLen()) {
                 throw new IllegalArgumentException();
             }
             int ivLen = algorithm.getIvLen();
             byte[] iv = new byte[ivLen];
             System.arraycopy(dataKey, Constants.NUM_0, iv, Constants.NUM_0, ivLen);
             cipherHandler.setIv(iv);
-            byte[] decryptDataKey = cipherHandler.cipherData(dataKey, dataKeyMaterials.getEncryptionContexts(), ivLen, dataKey.length - ivLen);
-            SecretKey secretKey1 = Utils.byteToSecretKey(decryptDataKey, dataKeyMaterials.getCryptoAlgorithm().getAlgorithmName());
+            byte[] decryptDataKey = cipherHandler.cipherData(dataKey, dataKeyMaterials.getEncryptionContexts(), ivLen,
+                dataKey.length - ivLen);
+            SecretKey secretKey1 = Utils.byteToSecretKey(decryptDataKey,
+                dataKeyMaterials.getCryptoAlgorithm().getAlgorithmName());
             dataKeyMaterials.setPlaintextDataKey(secretKey1);
             return true;
         } catch (Exception e) {
@@ -73,12 +78,10 @@ public class RawSM4CBCKeyring extends RawKeyring {
         return false;
     }
 
-
     @Override
     public List<byte[]> getEncryptSecretKey() {
         return getSymmetricKey();
     }
-
 
     @Override
     public List<byte[]> getDecryptSecretKey() {

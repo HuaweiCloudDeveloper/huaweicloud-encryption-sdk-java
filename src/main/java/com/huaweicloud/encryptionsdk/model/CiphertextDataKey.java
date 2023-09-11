@@ -1,6 +1,7 @@
 package com.huaweicloud.encryptionsdk.model;
 
 import com.huaweicloud.encryptionsdk.common.Utils;
+import com.huaweicloud.encryptionsdk.exception.ErrorMessage;
 import com.huaweicloud.encryptionsdk.exception.HuaweicloudException;
 import com.huaweicloud.encryptionsdk.model.enums.KeyProviderEnum;
 
@@ -22,6 +23,7 @@ public class CiphertextDataKey {
      * 标识符，用来区别数据密钥生成类型
      */
     private byte[] keyProvider;
+
     private byte[] dataKey;
 
     private short dataKeyLength;
@@ -29,6 +31,7 @@ public class CiphertextDataKey {
     private byte keyInformationLength;
 
     private byte[] keyInformation = new byte[0];
+
     private byte[] keyId;
 
     private byte[] region;
@@ -67,7 +70,6 @@ public class CiphertextDataKey {
     public CiphertextDataKey() {
     }
 
-
     public CiphertextDataKey(byte[] dataKey, KMSConfig kmsConfig) {
         this.dataKey = dataKey;
         this.dataKeyLength = (short) dataKey.length;
@@ -98,7 +100,6 @@ public class CiphertextDataKey {
          */
         this.totalLength = dataKeyLength + keyProviderLength + keyInformationLength + 4;
     }
-
 
     public byte[] getDataKey() {
         return dataKey;
@@ -153,22 +154,31 @@ public class CiphertextDataKey {
     public void byteArrayToBean(DataInputStream dataStream) throws IOException {
         keyProviderLength = dataStream.readByte();
         this.keyProvider = new byte[keyProviderLength];
-        dataStream.read(keyProvider);
+        int read = dataStream.read(keyProvider);
+        if (read != keyProvider.length) {
+            throw new HuaweicloudException(ErrorMessage.SOURCE_FILE_INVALID.getMessage());
+        }
         keyInformationLength = dataStream.readByte();
         if (keyInformationLength > 0) {
             this.keyInformation = new byte[keyInformationLength];
-            dataStream.read(keyInformation);
+            int readKeyInfo = dataStream.read(keyInformation);
+            if (readKeyInfo != keyInformation.length) {
+                throw new HuaweicloudException(ErrorMessage.SOURCE_FILE_INVALID.getMessage());
+            }
             parseKeyInformation();
         }
         dataKeyLength = dataStream.readShort();
         this.dataKey = new byte[dataKeyLength];
-        dataStream.read(dataKey);
+        int readDataKey = dataStream.read(dataKey);
+        if (readDataKey != dataKey.length) {
+            throw new HuaweicloudException(ErrorMessage.SOURCE_FILE_INVALID.getMessage());
+        }
         this.totalLength = dataKeyLength + keyProviderLength + keyInformationLength + 4;
     }
 
     private void parseKeyInformation() {
         try (ByteArrayInputStream outBytes = new ByteArrayInputStream(keyInformation);
-             DataInputStream dataStream = new DataInputStream(outBytes)) {
+            DataInputStream dataStream = new DataInputStream(outBytes)) {
             byte code = dataStream.readByte();
             if (Discovery.getDiscoveryStatus(code)) {
                 keyId = readField(dataStream);
@@ -188,17 +198,19 @@ public class CiphertextDataKey {
     private byte[] readField(DataInputStream dataStream) throws IOException {
         byte len = dataStream.readByte();
         byte[] bytes = new byte[len];
-        dataStream.read(bytes);
+        int read = dataStream.read(bytes);
+        if (read != bytes.length) {
+            throw new HuaweicloudException(ErrorMessage.SOURCE_FILE_INVALID.getMessage());
+        }
         return bytes;
     }
 
-
     enum Discovery {
-        DISCOVERY(true,(byte)1),
-        NO_DISCOVERY(false,(byte)2);
-
+        DISCOVERY(true, (byte) 1),
+        NO_DISCOVERY(false, (byte) 2);
 
         boolean isDiscovery;
+
         byte code;
 
         Discovery(boolean isDiscovery, byte code) {

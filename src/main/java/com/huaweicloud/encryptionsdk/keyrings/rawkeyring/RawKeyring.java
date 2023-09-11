@@ -98,7 +98,8 @@ public abstract class RawKeyring implements Keyring {
      * ciphertextDataKeys：加密后数据密钥密文存储集合
      * dataKeyMaterials：加解密所需的相关必要信息
      **/
-    public abstract void realEncrypt(byte[] bytes, List<CiphertextDataKey> ciphertextDataKeys, DataKeyMaterials dataKeyMaterials);
+    public abstract void realEncrypt(byte[] bytes, List<CiphertextDataKey> ciphertextDataKeys,
+        DataKeyMaterials dataKeyMaterials);
 
     /**
      * @return boolean
@@ -108,7 +109,8 @@ public abstract class RawKeyring implements Keyring {
      * ciphertextDataKeys：数据密钥密文存储集合
      * dataKeyMaterials：加解密所需的相关必要信息
      **/
-    public abstract boolean realDecrypt(byte[] bytes, CiphertextDataKey ciphertextDataKey, DataKeyMaterials dataKeyMaterials);
+    public abstract boolean realDecrypt(byte[] bytes, CiphertextDataKey ciphertextDataKey,
+        DataKeyMaterials dataKeyMaterials);
 
     @Override
     public DataKeyMaterials encryptDataKey(DataKeyMaterials dataKeyMaterials) throws IOException {
@@ -124,7 +126,8 @@ public abstract class RawKeyring implements Keyring {
         return dataKeyMaterials;
     }
 
-    private void doEncrypt(DataKeyMaterials dataKeyMaterials, List<byte[]> masterSecretKey) throws ExecutionException, InterruptedException {
+    private void doEncrypt(DataKeyMaterials dataKeyMaterials, List<byte[]> masterSecretKey)
+        throws ExecutionException, InterruptedException {
         List<CiphertextDataKey> ciphertextDataKeys = dataKeyMaterials.getCiphertextDataKeys();
         List<CompletableFuture<Void>> futureList = new ArrayList<>();
         for (byte[] bytes : masterSecretKey) {
@@ -132,19 +135,20 @@ public abstract class RawKeyring implements Keyring {
                 try {
                     realEncrypt(bytes, ciphertextDataKeys, dataKeyMaterials);
                 } catch (Exception e) {
-                    LOGGER.warn("encrypt data key error by local master key,please check the server information is right");
+                    LOGGER.warn(
+                        "encrypt data key error by local master key,please check the server information is right");
                 }
             });
             futureList.add(future);
         }
-        CompletableFuture<Void> completableFuture = CompletableFuture.allOf(futureList.toArray(new CompletableFuture[0]));
+        CompletableFuture<Void> completableFuture = CompletableFuture.allOf(
+            futureList.toArray(new CompletableFuture[0]));
         completableFuture.get();
         if (ciphertextDataKeys.size() <= 0) {
             throw new EncryptException(ErrorMessage.ENCRYPT_DATA_KEY_EXCEPTION.getMessage());
         }
         dataKeyMaterials.setCiphertextDataKeys(ciphertextDataKeys);
     }
-
 
     @Override
     public DataKeyMaterials decryptDataKey(DataKeyMaterials dataKeyMaterials) throws IOException {
@@ -171,6 +175,5 @@ public abstract class RawKeyring implements Keyring {
         }
         throw new KeyringNotMatchException(ErrorMessage.KEYRING_NOT_MATCH_EXCEPTION.getMessage());
     }
-
 
 }

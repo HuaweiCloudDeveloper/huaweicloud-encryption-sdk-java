@@ -1,12 +1,14 @@
 package com.huaweicloud.encryptionsdk.meterialmanager;
 
 import com.huaweicloud.encryptionsdk.HuaweiConfig;
+import com.huaweicloud.encryptionsdk.exception.ErrorMessage;
+import com.huaweicloud.encryptionsdk.exception.HuaweicloudException;
 import com.huaweicloud.encryptionsdk.handler.DefaultSerializeHandler;
 import com.huaweicloud.encryptionsdk.keyrings.Keyring;
 import com.huaweicloud.encryptionsdk.keyrings.kmskeyring.KMSKeyring;
+import com.huaweicloud.encryptionsdk.model.DataKeyMaterials;
 import com.huaweicloud.encryptionsdk.model.DataMaterials;
 import com.huaweicloud.encryptionsdk.model.enums.DataKeyGenerateType;
-import com.huaweicloud.encryptionsdk.model.DataKeyMaterials;
 import org.apache.commons.codec.DecoderException;
 
 import java.io.IOException;
@@ -32,7 +34,9 @@ public class DefaultCryptoMeterialsManager implements CryptoMeterialManager {
     }
 
     @Override
-    public DataKeyMaterials getMaterialsForEncrypt(Keyring keyring, DataKeyMaterials dataKeyMaterials, long plaintTextLength) throws NoSuchAlgorithmException, IOException, ExecutionException, InterruptedException, DecoderException {
+    public DataKeyMaterials getMaterialsForEncrypt(Keyring keyring, DataKeyMaterials dataKeyMaterials,
+        long plaintTextLength)
+        throws NoSuchAlgorithmException, IOException, ExecutionException, InterruptedException, DecoderException {
         DataKeyGenerate dataKeyGenerate;
         if (keyring instanceof KMSKeyring) {
             dataKeyGenerate = DataKeyGenerateFactory.getDataKeyGenerate(DataKeyGenerateType.KMS_GENERATE);
@@ -60,12 +64,18 @@ public class DefaultCryptoMeterialsManager implements CryptoMeterialManager {
     @Override
     public DataKeyMaterials getMaterialsForStreamDecrypt(Keyring keyring, InputStream inputStream) throws IOException {
         byte[] lengthByte = new byte[Short.SIZE / Byte.SIZE];
-        inputStream.read(lengthByte);
+        int readShort = inputStream.read(lengthByte);
+        if (readShort != lengthByte.length) {
+            throw new HuaweicloudException(ErrorMessage.SOURCE_FILE_INVALID.getMessage());
+        }
         ByteBuffer buffer = ByteBuffer.allocate(lengthByte.length).put(lengthByte);
         buffer.flip();
         short length = buffer.getShort();
         byte[] bytes = new byte[length];
-        inputStream.read(bytes);
+        int read = inputStream.read(bytes);
+        if (read != bytes.length) {
+            throw new HuaweicloudException(ErrorMessage.SOURCE_FILE_INVALID.getMessage());
+        }
         DataMaterials dataMaterials = new DefaultSerializeHandler().deserialize(bytes);
         DataKeyMaterials dataKeyMaterials = new DataKeyMaterials();
         dataKeyMaterials.setCiphertextDataKeys(dataMaterials.getHeaders().getCiphertextDataKeys());

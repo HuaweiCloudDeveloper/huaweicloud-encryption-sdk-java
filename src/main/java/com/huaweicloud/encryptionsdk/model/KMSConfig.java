@@ -42,16 +42,13 @@ public class KMSConfig {
         return region;
     }
 
-
     public String getKeyId() {
         return keyId;
     }
 
-
     public String getProjectId() {
         return projectId;
     }
-
 
     public String getEndPoint() {
         return endPoint;

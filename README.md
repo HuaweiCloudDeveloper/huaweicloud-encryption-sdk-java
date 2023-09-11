@@ -1,2 +1,2 @@
-# huaweicloud-encryption-sdk-java
+# EncryptionSDK
 

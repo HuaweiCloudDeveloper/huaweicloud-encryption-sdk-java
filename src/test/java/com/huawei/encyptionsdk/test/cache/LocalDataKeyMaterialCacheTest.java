@@ -3,6 +3,7 @@ package com.huawei.encyptionsdk.test.cache;
 import com.huaweicloud.encryptionsdk.HuaweiConfig;
 import com.huaweicloud.encryptionsdk.cache.DataKeyCache;
 import com.huaweicloud.encryptionsdk.cache.LocalDataKeyCache;
+import com.huaweicloud.encryptionsdk.common.FilePathForExampleConstants;
 import com.huaweicloud.encryptionsdk.common.Utils;
 import com.huaweicloud.encryptionsdk.keyrings.Keyring;
 import com.huaweicloud.encryptionsdk.keyrings.RawKeyringFactory;
@@ -20,10 +21,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 public class LocalDataKeyMaterialCacheTest {
@@ -34,12 +42,19 @@ public class LocalDataKeyMaterialCacheTest {
     Long survivalTime = 1000L;
 
     private static final String ENTRY_KEY0 = UUID.randomUUID().toString();
+
     private static final String ENTRY_KEY1 = UUID.randomUUID().toString();
+
     private static final String ENTRY_KEY2 = UUID.randomUUID().toString();
+
     private static final String ENTRY_KEY3 = UUID.randomUUID().toString();
+
     private static final String ENTRY_KEY4 = UUID.randomUUID().toString();
+
     private static final String ENTRY_KEY5 = UUID.randomUUID().toString();
-    private static final List<String> ENTRY_KEY_LIST = Arrays.asList(ENTRY_KEY0, ENTRY_KEY1, ENTRY_KEY2, ENTRY_KEY3, ENTRY_KEY4, ENTRY_KEY5);
+
+    private static final List<String> ENTRY_KEY_LIST = Arrays.asList(ENTRY_KEY0, ENTRY_KEY1, ENTRY_KEY2, ENTRY_KEY3,
+        ENTRY_KEY4, ENTRY_KEY5);
 
     private CryptoMeterialManager cryptoMeterialManager;
 
@@ -49,18 +64,17 @@ public class LocalDataKeyMaterialCacheTest {
 
     private Map<String, String> encryptionContext = new HashMap<>();
 
-
     @Before
     public void setUp() throws FileNotFoundException {
         cache = new LocalDataKeyCache();
         cache.setCapacity(20);
         cache.setSurvivalTime(5000);
         HuaweiConfig huaweiConfig = HuaweiConfig.builder()
-                .buildCryptoAlgorithm(CryptoAlgorithm.SM4_128_GCM_NOPADDING)
-                .build();
+            .cryptoAlgorithm(CryptoAlgorithm.SM4_128_GCM_NOPADDING)
+            .build();
         RawKeyring keyring = new RawKeyringFactory().getKeyring(KeyringTypeEnum.RAW_RSA.getType());
-        keyring.setPrivateKey(Utils.readMasterKey(Collections.singletonList("src/test/resources/rsapri.txt")));
-        keyring.setPublicKey(Utils.readMasterKey(Collections.singletonList("src/test/resources/rsapub.txt")));
+        keyring.setPrivateKey(Utils.readMasterKey(Collections.singletonList(FilePathForExampleConstants.RSA_PRI_FILE_PATH)));
+        keyring.setPublicKey(Utils.readMasterKey(Collections.singletonList(FilePathForExampleConstants.RSA_PUB_FILE_PATH)));
         this.keyring = keyring;
         cryptoMeterialManager = new DefaultCryptoMeterialsManager(huaweiConfig);
         encryptionContext.put("encryption", "context");
@@ -70,7 +84,6 @@ public class LocalDataKeyMaterialCacheTest {
         dataKeyMaterials.setEncryptionContexts(encryptionContext);
     }
 
-
     @Test
     public void Should_ok_When_CacheNUllTest() {
         assertNull(cache.getEntryForDecrypt(ENTRY_KEY0));
@@ -78,11 +91,13 @@ public class LocalDataKeyMaterialCacheTest {
     }
 
     @Test
-    public void Should_ok_When_CacheNotExistTest() throws DecoderException, NoSuchAlgorithmException, IOException, ExecutionException, InterruptedException {
+    public void Should_ok_When_CacheNotExistTest()
+        throws DecoderException, NoSuchAlgorithmException, IOException, ExecutionException, InterruptedException {
         List<DataKeyMaterials> list = new ArrayList<>();
 
         for (int i = 0; i < 6; i++) {
-            list.add(cryptoMeterialManager.getMaterialsForEncrypt(keyring, dataKeyMaterials, "PLAIN_TEXT".getBytes(StandardCharsets.UTF_8).length));
+            list.add(cryptoMeterialManager.getMaterialsForEncrypt(keyring, dataKeyMaterials,
+                "PLAIN_TEXT".getBytes(StandardCharsets.UTF_8).length));
         }
         cache.putEntryForDecrypt(ENTRY_KEY0, list.get(0));
         cache.putEntryForDecrypt(ENTRY_KEY1, list.get(1));
@@ -94,13 +109,14 @@ public class LocalDataKeyMaterialCacheTest {
         assertNull(entryForDecrypt);
     }
 
-
     @Test
-    public void Should_ok_When_CacheInvalidateTest() throws DecoderException, NoSuchAlgorithmException, IOException, ExecutionException, InterruptedException {
+    public void Should_ok_When_CacheInvalidateTest()
+        throws DecoderException, NoSuchAlgorithmException, IOException, ExecutionException, InterruptedException {
         List<DataKeyMaterials> list = new ArrayList<>();
 
         for (int i = 0; i < 6; i++) {
-            DataKeyMaterials materialsForEncrypt = cryptoMeterialManager.getMaterialsForEncrypt(keyring, dataKeyMaterials, "PLAIN_TEXT".getBytes(StandardCharsets.UTF_8).length);
+            DataKeyMaterials materialsForEncrypt = cryptoMeterialManager.getMaterialsForEncrypt(keyring,
+                dataKeyMaterials, "PLAIN_TEXT".getBytes(StandardCharsets.UTF_8).length);
             list.add(materialsForEncrypt);
             cache.putEntryForEncrypt(ENTRY_KEY_LIST.get(i), materialsForEncrypt, new DataKeyCache.UsageStatus(1, 1));
         }
@@ -109,22 +125,27 @@ public class LocalDataKeyMaterialCacheTest {
     }
 
     @Test
-    public void Should_ok_When_CacheExistTest() throws DecoderException, NoSuchAlgorithmException, IOException, ExecutionException, InterruptedException {
-        DataKeyMaterials dataKeyMaterials1 = cryptoMeterialManager.getMaterialsForEncrypt(keyring, dataKeyMaterials, "PLAIN_TEXT".getBytes(StandardCharsets.UTF_8).length);
-        DataKeyMaterials dataKeyMaterials2 = cryptoMeterialManager.getMaterialsForEncrypt(keyring, dataKeyMaterials, "PLAIN_TEXT".getBytes(StandardCharsets.UTF_8).length);
+    public void Should_ok_When_CacheExistTest()
+        throws DecoderException, NoSuchAlgorithmException, IOException, ExecutionException, InterruptedException {
+        DataKeyMaterials dataKeyMaterials1 = cryptoMeterialManager.getMaterialsForEncrypt(keyring, dataKeyMaterials,
+            "PLAIN_TEXT".getBytes(StandardCharsets.UTF_8).length);
+        DataKeyMaterials dataKeyMaterials2 = cryptoMeterialManager.getMaterialsForEncrypt(keyring, dataKeyMaterials,
+            "PLAIN_TEXT".getBytes(StandardCharsets.UTF_8).length);
         cache.putEntryForDecrypt(ENTRY_KEY0, dataKeyMaterials1);
         cache.putEntryForEncrypt(ENTRY_KEY1, dataKeyMaterials2, new DataKeyCache.UsageStatus(20, 2));
         assertEquals(dataKeyMaterials1, cache.getEntryForDecrypt(ENTRY_KEY0).getDataKeyMaterials());
-        assertEquals(dataKeyMaterials2, cache.getEntryForEncrypt(ENTRY_KEY1, new DataKeyCache.UsageStatus(1, 1)).getDataKeyMaterials());
+        assertEquals(dataKeyMaterials2,
+            cache.getEntryForEncrypt(ENTRY_KEY1, new DataKeyCache.UsageStatus(1, 1)).getDataKeyMaterials());
     }
 
-
     @Test
-    public void Should_ok_When_CacheDecryptDefaultTTLTest() throws DecoderException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException {
+    public void Should_ok_When_CacheDecryptDefaultTTLTest()
+        throws DecoderException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException {
         List<DataKeyMaterials> list = new ArrayList<>();
 
         for (int i = 0; i < 6; i++) {
-            list.add(cryptoMeterialManager.getMaterialsForEncrypt(keyring, dataKeyMaterials, "PLAIN_TEXT".getBytes(StandardCharsets.UTF_8).length));
+            list.add(cryptoMeterialManager.getMaterialsForEncrypt(keyring, dataKeyMaterials,
+                "PLAIN_TEXT".getBytes(StandardCharsets.UTF_8).length));
         }
         cache.putEntryForDecrypt(ENTRY_KEY0, list.get(0));
         cache.putEntryForDecrypt(ENTRY_KEY1, list.get(1));
@@ -141,17 +162,21 @@ public class LocalDataKeyMaterialCacheTest {
     }
 
     @Test
-    public void Should_ok_When_CacheEncryptDefaultTTLTest() throws DecoderException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException {
+    public void Should_ok_When_CacheEncryptDefaultTTLTest()
+        throws DecoderException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException {
         List<DataKeyMaterials> list = new ArrayList<>();
 
         for (int i = 0; i < 6; i++) {
-            DataKeyMaterials materialsForEncrypt = cryptoMeterialManager.getMaterialsForEncrypt(keyring, dataKeyMaterials, "PLAIN_TEXT".getBytes(StandardCharsets.UTF_8).length);
+            DataKeyMaterials materialsForEncrypt = cryptoMeterialManager.getMaterialsForEncrypt(keyring,
+                dataKeyMaterials, "PLAIN_TEXT".getBytes(StandardCharsets.UTF_8).length);
             list.add(materialsForEncrypt);
             cache.putEntryForEncrypt(ENTRY_KEY_LIST.get(i), materialsForEncrypt, new DataKeyCache.UsageStatus(1, 1));
         }
-        assertEquals(list.get(0), cache.getEntryForEncrypt(ENTRY_KEY0, new DataKeyCache.UsageStatus(1, 1)).getDataKeyMaterials());
+        assertEquals(list.get(0),
+            cache.getEntryForEncrypt(ENTRY_KEY0, new DataKeyCache.UsageStatus(1, 1)).getDataKeyMaterials());
         Thread.sleep(4000);
-        assertEquals(list.get(1), cache.getEntryForEncrypt(ENTRY_KEY1, new DataKeyCache.UsageStatus(1, 1)).getDataKeyMaterials());
+        assertEquals(list.get(1),
+            cache.getEntryForEncrypt(ENTRY_KEY1, new DataKeyCache.UsageStatus(1, 1)).getDataKeyMaterials());
         Thread.sleep(2000);
         for (int i = 0; i < 6; i++) {
             assertNull(cache.getEntryForEncrypt(ENTRY_KEY_LIST.get(i), new DataKeyCache.UsageStatus(1, 1)));
@@ -160,30 +185,38 @@ public class LocalDataKeyMaterialCacheTest {
     }
 
     @Test
-    public void Should_ok_When_CacheEncryptTTLTest() throws DecoderException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException {
+    public void Should_ok_When_CacheEncryptTTLTest()
+        throws DecoderException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException {
         List<DataKeyMaterials> list = new ArrayList<>();
 
         for (int i = 0; i < 6; i++) {
-            DataKeyMaterials materialsForEncrypt = cryptoMeterialManager.getMaterialsForEncrypt(keyring, dataKeyMaterials, "PLAIN_TEXT".getBytes(StandardCharsets.UTF_8).length);
+            DataKeyMaterials materialsForEncrypt = cryptoMeterialManager.getMaterialsForEncrypt(keyring,
+                dataKeyMaterials, "PLAIN_TEXT".getBytes(StandardCharsets.UTF_8).length);
             list.add(materialsForEncrypt);
-            cache.putEntryForEncrypt(ENTRY_KEY_LIST.get(i), 10000, materialsForEncrypt, new DataKeyCache.UsageStatus(1, 1));
+            cache.putEntryForEncrypt(ENTRY_KEY_LIST.get(i), 10000, materialsForEncrypt,
+                new DataKeyCache.UsageStatus(1, 1));
         }
-        assertEquals(list.get(0), cache.getEntryForEncrypt(ENTRY_KEY0, new DataKeyCache.UsageStatus(1, 1)).getDataKeyMaterials());
+        assertEquals(list.get(0),
+            cache.getEntryForEncrypt(ENTRY_KEY0, new DataKeyCache.UsageStatus(1, 1)).getDataKeyMaterials());
         Thread.sleep(4000);
-        assertEquals(list.get(1), cache.getEntryForEncrypt(ENTRY_KEY1, new DataKeyCache.UsageStatus(1, 1)).getDataKeyMaterials());
+        assertEquals(list.get(1),
+            cache.getEntryForEncrypt(ENTRY_KEY1, new DataKeyCache.UsageStatus(1, 1)).getDataKeyMaterials());
         Thread.sleep(5000);
         for (int i = 0; i < 6; i++) {
-            assertNotNull(cache.getEntryForEncrypt(ENTRY_KEY_LIST.get(i), new DataKeyCache.UsageStatus(1, 1)).getDataKeyMaterials());
+            assertNotNull(cache.getEntryForEncrypt(ENTRY_KEY_LIST.get(i), new DataKeyCache.UsageStatus(1, 1))
+                .getDataKeyMaterials());
         }
 
     }
 
     @Test
-    public void Should_ok_When_CacheDecryptTTLTest() throws DecoderException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException {
+    public void Should_ok_When_CacheDecryptTTLTest()
+        throws DecoderException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException {
         List<DataKeyMaterials> list = new ArrayList<>();
 
         for (int i = 0; i < 6; i++) {
-            DataKeyMaterials materialsForEncrypt = cryptoMeterialManager.getMaterialsForEncrypt(keyring, dataKeyMaterials, "PLAIN_TEXT".getBytes(StandardCharsets.UTF_8).length);
+            DataKeyMaterials materialsForEncrypt = cryptoMeterialManager.getMaterialsForEncrypt(keyring,
+                dataKeyMaterials, "PLAIN_TEXT".getBytes(StandardCharsets.UTF_8).length);
             list.add(materialsForEncrypt);
             cache.putEntryForDecrypt(ENTRY_KEY_LIST.get(i), 10000, materialsForEncrypt);
         }
@@ -198,13 +231,14 @@ public class LocalDataKeyMaterialCacheTest {
     }
 
     @Test
-    public void Should_ok_When_CacheLimitTest() throws DecoderException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException {
-
+    public void Should_ok_When_CacheLimitTest()
+        throws DecoderException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException {
 
         List<DataKeyMaterials> list = new ArrayList<>();
 
         for (int i = 0; i < 6; i++) {
-            DataKeyMaterials materialsForEncrypt = cryptoMeterialManager.getMaterialsForEncrypt(keyring, dataKeyMaterials, "PLAIN_TEXT".getBytes(StandardCharsets.UTF_8).length);
+            DataKeyMaterials materialsForEncrypt = cryptoMeterialManager.getMaterialsForEncrypt(keyring,
+                dataKeyMaterials, "PLAIN_TEXT".getBytes(StandardCharsets.UTF_8).length);
             list.add(materialsForEncrypt);
             cache.putEntryForDecrypt(ENTRY_KEY_LIST.get(i), 10000, materialsForEncrypt);
         }
@@ -217,6 +251,5 @@ public class LocalDataKeyMaterialCacheTest {
         }
 
     }
-
 
 }

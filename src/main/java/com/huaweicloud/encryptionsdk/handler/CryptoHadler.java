@@ -1,6 +1,5 @@
 package com.huaweicloud.encryptionsdk.handler;
 
-
 import com.huaweicloud.encryptionsdk.model.CryptoResult;
 import com.huaweicloud.encryptionsdk.model.DataKeyMaterials;
 import com.huaweicloud.encryptionsdk.model.request.EncryptRequest;
@@ -24,7 +23,8 @@ public interface CryptoHadler {
      * request：加密请求，封装了加密数据明文和加密上下文材料
      * dataKeyMaterials：数据密钥和算法等加密必要信息
      **/
-    CryptoResult<byte[]> encrypt(EncryptRequest request, DataKeyMaterials dataKeyMaterials) throws NoSuchAlgorithmException, NoSuchProviderException;
+    CryptoResult<byte[]> encrypt(EncryptRequest request, DataKeyMaterials dataKeyMaterials)
+        throws NoSuchAlgorithmException, NoSuchProviderException;
 
     /**
      * @return com.huaweicloud.encryptionsdk.model.CryptoResult<byte [ ]>
@@ -44,7 +44,9 @@ public interface CryptoHadler {
      * dataKeyMaterials：数据密钥和算法等加密必要信息
      * encryptionContext：加密上下文
      **/
-    CryptoResult<OutputStream> encrypt(InputStream inputStream, OutputStream outputStream, DataKeyMaterials dataKeyMaterials, Map<String, String> encryptionContext) throws IOException, NoSuchAlgorithmException, NoSuchProviderException;
+    CryptoResult<OutputStream> encrypt(InputStream inputStream, OutputStream outputStream,
+        DataKeyMaterials dataKeyMaterials, Map<String, String> encryptionContext)
+        throws IOException, NoSuchAlgorithmException, NoSuchProviderException;
 
     /**
      * @return com.huaweicloud.encryptionsdk.model.CryptoResult<java.io.OutputStream>
@@ -53,6 +55,7 @@ public interface CryptoHadler {
      * inputStream：密文输入流
      * outputStream：明文输出流
      **/
-    CryptoResult<OutputStream> decrypt(InputStream inputStream, OutputStream outputStream, DataKeyMaterials dataKeyMaterials) throws IOException;
+    CryptoResult<OutputStream> decrypt(InputStream inputStream, OutputStream outputStream,
+        DataKeyMaterials dataKeyMaterials) throws IOException;
 
 }

@@ -16,10 +16,21 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.security.*;
+import java.security.KeyFactory;
+import java.security.MessageDigest;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Security;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * common utils
@@ -49,7 +60,10 @@ public class Utils {
             try (InputStream inputStream = Files.newInputStream(file.toPath());) {
                 int available = inputStream.available();
                 byte[] bytes = new byte[available];
-                inputStream.read(bytes);
+                int read = inputStream.read(bytes);
+                if (read != bytes.length) {
+                    throw new HuaweicloudException(ErrorMessage.SOURCE_FILE_INVALID.getMessage());
+                }
                 byte[] removeLineSymbol = removeLineSymbol(bytes);
                 byte[] originalMasterKey = Base64.getDecoder().decode(removeLineSymbol);
                 publicKeyList.add(originalMasterKey);
@@ -107,7 +121,7 @@ public class Utils {
     }
 
     public static byte[] removeLineSymbol(byte[] bytes) {
-        String str = new String(bytes).replaceAll("(\\r\\n|\\n|\\\\n)", "");
+        String str = new String(bytes, StandardCharsets.UTF_8).replaceAll("(\\r\\n|\\n|\\\\n)", "");
         return str.getBytes(StandardCharsets.UTF_8);
     }
 
@@ -115,7 +129,6 @@ public class Utils {
         SecretKey originalKey = new SecretKeySpec(bytes, 0, bytes.length, algorithm);
         return originalKey;
     }
-
 
     public static PublicKey getPublicKey(byte[] publicKey, String algFlag) {
         try {
@@ -159,7 +172,6 @@ public class Utils {
         return encryptionContextBytes;
     }
 
-
     public static Map<String, String> deserializeContext(byte[] encryptionContextBytes) {
         if (encryptionContextBytes == null || encryptionContextBytes.length == 0) {
             return new HashMap<>();
@@ -176,24 +188,20 @@ public class Utils {
             int valueLen = buffer.getShort();
             byte[] valueBytes = new byte[valueLen];
             buffer.get(valueBytes);
-            map.put(new String(keyBytes), new String(valueBytes));
+            map.put(new String(keyBytes, StandardCharsets.UTF_8), new String(valueBytes, StandardCharsets.UTF_8));
         }
         return map;
     }
 
-
-    public static byte[] hexToBytes(String hexString)
-            throws DecoderException {
+    public static byte[] hexToBytes(String hexString) throws DecoderException {
         // 128字节的常量数组，非16进制的
-        final byte[] btHEX = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-                -1, '0',
-                '1', '2', '3', '4', '5', '6', '7', '8', '9', -1, -1, -1, -1, -1, -1, -1, 'A', 'B', 'C', 'D', 'E',
-                'F', -1,
-                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 'a',
-                'b', 'c', 'd', 'e', 'f', -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-                -1, -1,
-                -1, -1, -1, -1};
+        final byte[] btHEX = {
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, '0', '1', '2', '3', '4',
+            '5', '6', '7', '8', '9', -1, -1, -1, -1, -1, -1, -1, 'A', 'B', 'C', 'D', 'E', 'F', -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 'a', 'b', 'c', 'd', 'e',
+            'f', -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+        };
 
         final int length2 = 2;
 
@@ -209,7 +217,6 @@ public class Utils {
 
         return Hex.decodeHex(hexString.toCharArray());
     }
-
 
     public static String bytesToHex(byte[] bytes) {
         return new String(Hex.encodeHex(bytes));

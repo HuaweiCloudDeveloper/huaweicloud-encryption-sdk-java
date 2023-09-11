@@ -1,5 +1,6 @@
 package com.huawei.encyptionsdk.test.keyringtest;
 
+import com.huaweicloud.encryptionsdk.common.FilePathForExampleConstants;
 import com.huaweicloud.encryptionsdk.common.Utils;
 import com.huaweicloud.encryptionsdk.keyrings.RawKeyringFactory;
 import com.huaweicloud.encryptionsdk.keyrings.rawkeyring.RawKeyring;
@@ -22,41 +23,49 @@ import java.util.Base64;
 import java.util.Collections;
 
 /**
- * RawAesKeyringTest
+ * @author zc
+ * @ClassName RawAesKeyringTest
+ * @description:
+ * @datetime 2022年 09月 08日 16:23
  */
 public class RawSm4KeyringTest {
     @Test
-    public void Should_ok_When_StateUnderSM4EncryptTest() throws IOException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, InvalidCipherTextException {
+    public void Should_ok_When_StateUnderSM4EncryptTest()
+        throws IOException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException,
+        BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, InvalidCipherTextException {
         String dataKey = "5sFKOkwE2lRAIASXm3QFNoNRX1GbEKYgVZHmOdi7smU=";
         DataKeyMaterials dataKeyMaterials = new DataKeyMaterials();
         byte[] decode = Base64.getDecoder().decode(dataKey);
         dataKeyMaterials.setPlaintextDataKey(new SecretKeySpec(decode, 0, decode.length, "AES"));
         RawKeyringFactory rawKeyringFactory = new RawKeyringFactory();
         RawKeyring keyring = rawKeyringFactory.getKeyring("sm4_gcm");
-        keyring.setSymmetricKey(Utils.readMasterKey(Collections.singletonList("src/test/resources/128bit")));
+        keyring.setSymmetricKey(Utils.readMasterKey(Collections.singletonList(FilePathForExampleConstants.BIT_128_FILE_PATH)));
         dataKeyMaterials.setCryptoAlgorithm(CryptoAlgorithm.SM4_128_GCM_NOPADDING);
         keyring.encryptDataKey(dataKeyMaterials);
-        System.out.println(Base64.getEncoder().encodeToString(dataKeyMaterials.getCiphertextDataKeys().get(0).getDataKey()));
+        System.out.println(
+            Base64.getEncoder().encodeToString(dataKeyMaterials.getCiphertextDataKeys().get(0).getDataKey()));
         dataKeyMaterials.setPlaintextDataKey(null);
         keyring.decryptDataKey(dataKeyMaterials);
         SecretKey plaintextDataKey = dataKeyMaterials.getPlaintextDataKey();
         String encodedKey = Base64.getEncoder().encodeToString(plaintextDataKey.getEncoded());
-        Assert.assertEquals(dataKey,encodedKey);
+        Assert.assertEquals(dataKey, encodedKey);
     }
 
-
     @Test
-    public void Should_ok_When_StateUnderSM4CBCEncryptTest() throws IOException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, InvalidCipherTextException {
+    public void Should_ok_When_StateUnderSM4CBCEncryptTest()
+        throws IOException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException,
+        BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, InvalidCipherTextException {
         String dataKey = "5sFKOkwE2lRAIASXm3QFNoNRX1GbEKYgVZHmOdi7smU=";
         DataKeyMaterials dataKeyMaterials = new DataKeyMaterials();
         byte[] decode = Base64.getDecoder().decode(dataKey);
         dataKeyMaterials.setPlaintextDataKey(new SecretKeySpec(decode, 0, decode.length, "AES"));
         RawKeyringFactory rawKeyringFactory = new RawKeyringFactory();
         RawKeyring keyring = rawKeyringFactory.getKeyring("sm4_cbc");
-        keyring.setSymmetricKey(Utils.readMasterKey(Collections.singletonList("src/test/resources/128bit")));
+        keyring.setSymmetricKey(Utils.readMasterKey(Collections.singletonList(FilePathForExampleConstants.BIT_128_FILE_PATH)));
         dataKeyMaterials.setCryptoAlgorithm(CryptoAlgorithm.SM4_128_CBC_PADDING);
         keyring.encryptDataKey(dataKeyMaterials);
-        System.out.println(Base64.getEncoder().encodeToString(dataKeyMaterials.getCiphertextDataKeys().get(0).getDataKey()));
+        System.out.println(
+            Base64.getEncoder().encodeToString(dataKeyMaterials.getCiphertextDataKeys().get(0).getDataKey()));
         dataKeyMaterials.setPlaintextDataKey(null);
         keyring.decryptDataKey(dataKeyMaterials);
         SecretKey plaintextDataKey = dataKeyMaterials.getPlaintextDataKey();

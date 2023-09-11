@@ -16,13 +16,11 @@ import java.util.List;
  */
 public class KMSDiscoveryKeyring extends KMSKeyring {
 
-
     @Override
     public void doDecrypt(DataKeyMaterials dataKeyMaterials) {
         prepareKeyId(dataKeyMaterials);
         super.realDecrypt(dataKeyMaterials);
     }
-
 
     private void prepareKeyId(DataKeyMaterials dataKeyMaterials) {
         List<KMSConfig> kmsConfigList = new ArrayList<>();
@@ -30,13 +28,15 @@ public class KMSDiscoveryKeyring extends KMSKeyring {
             if (!checkDisvocery(ciphertextDataKey)) {
                 throw new HuaweicloudException(ErrorMessage.NOT_SUPPORT_DISCOVERY_DECRYPT.getMessage());
             }
-            kmsConfigList.add(new KMSConfig(ciphertextDataKey.getRegion(), ciphertextDataKey.getKeyId(), ciphertextDataKey.getProjectId(), ciphertextDataKey.getEndPoint()));
+            kmsConfigList.add(new KMSConfig(ciphertextDataKey.getRegion(), ciphertextDataKey.getKeyId(),
+                ciphertextDataKey.getProjectId(), ciphertextDataKey.getEndPoint()));
         }
         HuaweiConfig huaweiConfig = super.getHuaweiConfig();
         huaweiConfig.setKmsConfigList(kmsConfigList);
     }
 
     private boolean checkDisvocery(CiphertextDataKey ciphertextDataKey) {
-        return ciphertextDataKey.isDiscovery() && !Utils.isEmpty(ciphertextDataKey.getKeyId()) && !Utils.isEmpty(ciphertextDataKey.getRegion()) && !Utils.isEmpty(ciphertextDataKey.getProjectId());
+        return ciphertextDataKey.isDiscovery() && !Utils.isEmpty(ciphertextDataKey.getKeyId()) && !Utils.isEmpty(
+            ciphertextDataKey.getRegion()) && !Utils.isEmpty(ciphertextDataKey.getProjectId());
     }
 }

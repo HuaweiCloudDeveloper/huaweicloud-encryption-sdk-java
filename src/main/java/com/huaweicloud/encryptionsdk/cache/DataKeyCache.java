@@ -33,7 +33,8 @@ public interface DataKeyCache {
      * dataKeyMaterials: 数据密钥材料，缓存value的实际内容
      * initialUsage: 数据密钥使用情况初始化对象
      **/
-    void putEntryForEncrypt(String cacheId, long surviveTime, DataKeyMaterials dataKeyMaterials, UsageStatus initialUsage);
+    void putEntryForEncrypt(String cacheId, long surviveTime, DataKeyMaterials dataKeyMaterials,
+        UsageStatus initialUsage);
 
     /**
      * @return com.huaweicloud.encryptionsdk.cache.DataKeyCache.DecryptCacheEntry
@@ -106,7 +107,6 @@ public interface DataKeyCache {
         }
     }
 
-
     /**
      * 加密密钥使用情况封装类
      */
@@ -142,7 +142,8 @@ public interface DataKeyCache {
          * usageStatus ： 当次加密所使用的次数和字节数量封装
          **/
         public UsageStatus add(UsageStatus usageStatus) {
-            return new UsageStatus(Utils.addPreventOverFlow(bytesEncryptCount, usageStatus.bytesEncryptCount), Utils.addPreventOverFlow(messageEncryptCount, usageStatus.messageEncryptCount));
+            return new UsageStatus(Utils.addPreventOverFlow(bytesEncryptCount, usageStatus.bytesEncryptCount),
+                Utils.addPreventOverFlow(messageEncryptCount, usageStatus.messageEncryptCount));
         }
 
     }

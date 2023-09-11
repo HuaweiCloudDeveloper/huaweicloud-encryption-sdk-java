@@ -1,6 +1,5 @@
 package com.huaweicloud.encryptionsdk.exception;
 
-
 public class EncryptException extends HuaweicloudException {
     public EncryptException() {
         super();

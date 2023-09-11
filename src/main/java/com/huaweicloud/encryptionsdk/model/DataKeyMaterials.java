@@ -1,6 +1,5 @@
 package com.huaweicloud.encryptionsdk.model;
 
-
 import com.huaweicloud.encryptionsdk.model.enums.CryptoAlgorithm;
 
 import javax.crypto.SecretKey;
@@ -12,8 +11,11 @@ import java.util.Map;
 public final class DataKeyMaterials {
 
     private SecretKey plaintextDataKey;
+
     private List<CiphertextDataKey> ciphertextDataKeys = new ArrayList<>();
+
     private Map<String, String> encryptionContexts = new HashMap<>();
+
     private CryptoAlgorithm cryptoAlgorithm;
 
     public SecretKey getPlaintextDataKey() {

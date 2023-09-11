@@ -1,10 +1,10 @@
 package com.huawei.encyptionsdk.test.cache;
 
-
 import com.huawei.encyptionsdk.test.EncryptDecryptTest;
 import com.huaweicloud.encryptionsdk.HuaweiConfig;
 import com.huaweicloud.encryptionsdk.HuaweiCrypto;
 import com.huaweicloud.encryptionsdk.cache.LocalDataKeyCache;
+import com.huaweicloud.encryptionsdk.common.FilePathForExampleConstants;
 import com.huaweicloud.encryptionsdk.common.Utils;
 import com.huaweicloud.encryptionsdk.exception.HuaweicloudException;
 import com.huaweicloud.encryptionsdk.keyrings.KmsKeyringFactory;
@@ -16,25 +16,22 @@ import com.huaweicloud.encryptionsdk.model.KMSConfig;
 import com.huaweicloud.encryptionsdk.model.enums.CryptoAlgorithm;
 import com.huaweicloud.encryptionsdk.model.enums.KeyringTypeEnum;
 import com.huaweicloud.encryptionsdk.model.request.EncryptRequest;
-import org.apache.commons.codec.DecoderException;
+import com.huaweicloud.encryptionsdk.util.CommonUtils;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertSame;
 
 public class CachingDataKeyTest {
 
-
     private HuaweiCrypto huaweiCrypto;
+
     private HuaweiConfig config;
 
     private static final String PLAIN_TEXT = "Hello World!";
@@ -43,29 +40,27 @@ public class CachingDataKeyTest {
 
     @Before
     public void setUp() throws FileNotFoundException {
-        config = HuaweiConfig.builder()
-                .buildCryptoAlgorithm(CryptoAlgorithm.SM4_128_GCM_NOPADDING)
-                .build();
+        config = HuaweiConfig.builder().cryptoAlgorithm(CryptoAlgorithm.SM4_128_GCM_NOPADDING).build();
         RawKeyring keyring = new RawKeyringFactory().getKeyring(KeyringTypeEnum.RAW_RSA.getType());
-        keyring.setPrivateKey(Utils.readMasterKey(Collections.singletonList("src/test/resources/rsapri.txt")));
-        keyring.setPublicKey(Utils.readMasterKey(Collections.singletonList("src/test/resources/rsapub.txt")));
+        keyring.setPrivateKey(
+            Utils.readMasterKey(Collections.singletonList(FilePathForExampleConstants.RSA_PRI_FILE_PATH)));
+        keyring.setPublicKey(
+            Utils.readMasterKey(Collections.singletonList(FilePathForExampleConstants.RSA_PUB_FILE_PATH)));
         huaweiCrypto = new HuaweiCrypto(config).withKeyring(keyring);
     }
 
-
     @Test
-    public void Should_ok_When_CacheTest() throws DecoderException, NoSuchAlgorithmException, IOException, InterruptedException {
-        Map<String, String> encryptionContext = new HashMap<>();
-        encryptionContext.put("encryption", "context");
-        encryptionContext.put("simple", "test");
-        encryptionContext.put("caching", "encrypt");
+    public void Should_ok_When_CacheTest() throws InterruptedException {
+        Map<String, String> encryptionContext = CommonUtils.getEncryptionContext();
 
-        CacheCryptoMeterialManager cacheCryptoMeterialManager = new CacheCryptoMeterialManager(new LocalDataKeyCache(), config);
+        CacheCryptoMeterialManager cacheCryptoMeterialManager = new CacheCryptoMeterialManager(new LocalDataKeyCache(),
+            config);
         cacheCryptoMeterialManager.setMaxByteLimit(50);
         cacheCryptoMeterialManager.setSurvivalTime(5000);
         huaweiCrypto.withCryptoMeterialManager(cacheCryptoMeterialManager);
 
-        CryptoResult<byte[]> encryptResult = huaweiCrypto.encrypt(new EncryptRequest(encryptionContext, PLAIN_TEXT.getBytes(ENCODING)));
+        CryptoResult<byte[]> encryptResult = huaweiCrypto.encrypt(
+            new EncryptRequest(encryptionContext, PLAIN_TEXT.getBytes(ENCODING)));
         byte[] cipherResult = encryptResult.getResult();
 
         CryptoResult<byte[]> decrypt = huaweiCrypto.decrypt(cipherResult);
@@ -89,22 +84,20 @@ public class CachingDataKeyTest {
         assertSame(new String(decrypt.getResult()).intern(), "no_cache");
     }
 
-
     @Test
-    public void Should_ok_When_CacheExceedMessageLimitTest() throws DecoderException, NoSuchAlgorithmException, IOException, InterruptedException {
+    public void Should_ok_When_CacheExceedMessageLimitTest() throws InterruptedException {
         String str = "hello world";
-        Map<String, String> encryptionContext = new HashMap<>();
-        encryptionContext.put("encryption", "context");
-        encryptionContext.put("simple", "test");
-        encryptionContext.put("caching", "encrypt");
+        Map<String, String> encryptionContext = CommonUtils.getEncryptionContext();
 
-        CacheCryptoMeterialManager cacheCryptoMeterialManager = new CacheCryptoMeterialManager(new LocalDataKeyCache(), config);
+        CacheCryptoMeterialManager cacheCryptoMeterialManager = new CacheCryptoMeterialManager(new LocalDataKeyCache(),
+            config);
         cacheCryptoMeterialManager.setMaxByteLimit(50);
         cacheCryptoMeterialManager.setMaxMessageLimit(1);
         cacheCryptoMeterialManager.setSurvivalTime(50000);
         huaweiCrypto.withCryptoMeterialManager(cacheCryptoMeterialManager);
 
-        CryptoResult<byte[]> encryptResult = huaweiCrypto.encrypt(new EncryptRequest(encryptionContext, PLAIN_TEXT.getBytes(ENCODING)));
+        CryptoResult<byte[]> encryptResult = huaweiCrypto.encrypt(
+            new EncryptRequest(encryptionContext, PLAIN_TEXT.getBytes(ENCODING)));
         byte[] cipherResult = encryptResult.getResult();
 
         CryptoResult<byte[]> decrypt = huaweiCrypto.decrypt(cipherResult);
@@ -129,18 +122,17 @@ public class CachingDataKeyTest {
     }
 
     @Test(expected = HuaweicloudException.class)
-    public void Should_Error_When_CacheEncryptExceedByteLimitTest() throws DecoderException, NoSuchAlgorithmException, IOException, InterruptedException {
-        Map<String, String> encryptionContext = new HashMap<>();
-        encryptionContext.put("encryption", "context");
-        encryptionContext.put("simple", "test");
-        encryptionContext.put("caching", "encrypt");
+    public void Should_Error_When_CacheEncryptExceedByteLimitTest() {
+        Map<String, String> encryptionContext = CommonUtils.getEncryptionContext();
 
-        CacheCryptoMeterialManager cacheCryptoMeterialManager = new CacheCryptoMeterialManager(new LocalDataKeyCache(), config);
+        CacheCryptoMeterialManager cacheCryptoMeterialManager = new CacheCryptoMeterialManager(new LocalDataKeyCache(),
+            config);
         cacheCryptoMeterialManager.setMaxByteLimit(1);
         cacheCryptoMeterialManager.setMaxMessageLimit(10);
         huaweiCrypto.withCryptoMeterialManager(cacheCryptoMeterialManager);
 
-        CryptoResult<byte[]> encryptResult = huaweiCrypto.encrypt(new EncryptRequest(encryptionContext, PLAIN_TEXT.getBytes(ENCODING)));
+        CryptoResult<byte[]> encryptResult = huaweiCrypto.encrypt(
+            new EncryptRequest(encryptionContext, PLAIN_TEXT.getBytes(ENCODING)));
         byte[] cipherResult = encryptResult.getResult();
 
         CryptoResult<byte[]> decrypt = huaweiCrypto.decrypt(cipherResult);
@@ -149,25 +141,26 @@ public class CachingDataKeyTest {
     }
 
     @Test(expected = HuaweicloudException.class)
-    public void Should_ok_When_KMSCacheTest() throws DecoderException, NoSuchAlgorithmException, IOException, InterruptedException {
-        Map<String, String> encryptionContext = new HashMap<>();
-        encryptionContext.put("encryption", "context");
-        encryptionContext.put("simple", "test");
-        encryptionContext.put("caching", "encrypt");
-        HuaweiConfig config = HuaweiConfig.builder().buildSk(EncryptDecryptTest.SECRET_ACCESS_KEY)
-                .buildAk(EncryptDecryptTest.ACCESS_KEY)
-                .buildKmsConfig(Collections.singletonList(new KMSConfig(EncryptDecryptTest.REGION, EncryptDecryptTest.KEYID, EncryptDecryptTest.PROJECT_ID)))
-                .buildCryptoAlgorithm(CryptoAlgorithm.AES_256_GCM_NOPADDING)
-                .build();
+    public void Should_ok_When_KMSCacheTest() throws InterruptedException {
+        Map<String, String> encryptionContext = CommonUtils.getEncryptionContext();
+        HuaweiConfig config = HuaweiConfig.builder()
+            .sk(EncryptDecryptTest.SECRET_ACCESS_KEY)
+            .ak(EncryptDecryptTest.ACCESS_KEY)
+            .kmsConfigList(Collections.singletonList(
+                new KMSConfig(EncryptDecryptTest.REGION, EncryptDecryptTest.KEYID, EncryptDecryptTest.PROJECT_ID)))
+            .cryptoAlgorithm(CryptoAlgorithm.AES_256_GCM_NOPADDING)
+            .build();
         HuaweiCrypto huaweiCrypto = new HuaweiCrypto(config);
         huaweiCrypto.withKeyring(new KmsKeyringFactory().getKeyring(KeyringTypeEnum.KMS_MULTI_REGION.getType()));
 
-        CacheCryptoMeterialManager cacheCryptoMeterialManager = new CacheCryptoMeterialManager(new LocalDataKeyCache(), config);
+        CacheCryptoMeterialManager cacheCryptoMeterialManager = new CacheCryptoMeterialManager(new LocalDataKeyCache(),
+            config);
         cacheCryptoMeterialManager.setMaxByteLimit(50);
         cacheCryptoMeterialManager.setSurvivalTime(5000);
         huaweiCrypto.withCryptoMeterialManager(cacheCryptoMeterialManager);
 
-        CryptoResult<byte[]> encryptResult = huaweiCrypto.encrypt(new EncryptRequest(encryptionContext, PLAIN_TEXT.getBytes(ENCODING)));
+        CryptoResult<byte[]> encryptResult = huaweiCrypto.encrypt(
+            new EncryptRequest(encryptionContext, PLAIN_TEXT.getBytes(ENCODING)));
         byte[] cipherResult = encryptResult.getResult();
 
         CryptoResult<byte[]> decrypt = huaweiCrypto.decrypt(cipherResult);

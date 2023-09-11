@@ -2,8 +2,8 @@ package com.huaweicloud.encryptionsdk.meterialmanager;
 
 import com.huaweicloud.encryptionsdk.HuaweiConfig;
 import com.huaweicloud.encryptionsdk.common.Constants;
-import com.huaweicloud.encryptionsdk.model.enums.CryptoAlgorithm;
 import com.huaweicloud.encryptionsdk.model.DataKeyMaterials;
+import com.huaweicloud.encryptionsdk.model.enums.CryptoAlgorithm;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -16,10 +16,12 @@ import java.security.SecureRandom;
 public class LocalDataKeyGenerate implements DataKeyGenerate {
 
     private static final String KEY_ALGORITHM_SM4 = "SM4";
+
     private static final String KEY_ALGORITHM_AES = "AES";
 
     @Override
-    public void dataKeyGenerate(HuaweiConfig huaweiConfig, DataKeyMaterials dataKeyMaterials) throws NoSuchAlgorithmException {
+    public void dataKeyGenerate(HuaweiConfig huaweiConfig, DataKeyMaterials dataKeyMaterials)
+        throws NoSuchAlgorithmException {
         CryptoAlgorithm algorithm = huaweiConfig.getCryptoAlgorithm();
         String[] keySpecArr = algorithm.getKeySpec().split(Constants.KEY_SPEC_DELIMITER);
         String keSpec = keySpecArr[0];

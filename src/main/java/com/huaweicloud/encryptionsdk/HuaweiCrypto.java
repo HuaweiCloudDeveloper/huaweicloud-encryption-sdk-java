@@ -10,9 +10,9 @@ import com.huaweicloud.encryptionsdk.keyrings.kmskeyring.KMSKeyring;
 import com.huaweicloud.encryptionsdk.meterialmanager.CacheCryptoMeterialManager;
 import com.huaweicloud.encryptionsdk.meterialmanager.CryptoMeterialManager;
 import com.huaweicloud.encryptionsdk.meterialmanager.DefaultCryptoMeterialsManager;
-import com.huaweicloud.encryptionsdk.model.enums.CryptoAlgorithm;
 import com.huaweicloud.encryptionsdk.model.CryptoResult;
 import com.huaweicloud.encryptionsdk.model.DataKeyMaterials;
+import com.huaweicloud.encryptionsdk.model.enums.CryptoAlgorithm;
 import com.huaweicloud.encryptionsdk.model.request.EncryptRequest;
 import org.apache.commons.codec.DecoderException;
 
@@ -35,7 +35,9 @@ public class HuaweiCrypto {
 
     public HuaweiCrypto(HuaweiConfig huaweiConfig) {
         this.huaweiConfig = huaweiConfig;
-        huaweiConfig.setCryptoAlgorithm(huaweiConfig.getCryptoAlgorithm() == null ? CryptoAlgorithm.AES_128_GCM_NOPADDING : huaweiConfig.getCryptoAlgorithm());
+        huaweiConfig.setCryptoAlgorithm(huaweiConfig.getCryptoAlgorithm() == null
+            ? CryptoAlgorithm.AES_128_GCM_NOPADDING
+            : huaweiConfig.getCryptoAlgorithm());
         this.cryptoHandler = new DefaultCryptoHandler();
         this.cryptoMeterialManager = new DefaultCryptoMeterialsManager(huaweiConfig);
     }
@@ -53,7 +55,8 @@ public class HuaweiCrypto {
         return this;
     }
 
-    public CryptoResult<byte[]> encrypt(byte[] plaintText) throws NoSuchAlgorithmException, IOException, DecoderException {
+    public CryptoResult<byte[]> encrypt(byte[] plaintText)
+        throws NoSuchAlgorithmException, IOException, DecoderException {
         return encrypt(new EncryptRequest(Collections.emptyMap(), plaintText));
     }
 
@@ -67,17 +70,19 @@ public class HuaweiCrypto {
             dataKeyMaterials = new DataKeyMaterials();
             dataKeyMaterials.setEncryptionContexts(request.getEncryptionContext());
             dataKeyMaterials.setCryptoAlgorithm(huaweiConfig.getCryptoAlgorithm());
-            if (cryptoMeterialManager instanceof CacheCryptoMeterialManager && ((CacheCryptoMeterialManager) cryptoMeterialManager).getMaxByteLimit() < request.getPlainText().length) {
+            if (cryptoMeterialManager instanceof CacheCryptoMeterialManager
+                && ((CacheCryptoMeterialManager) cryptoMeterialManager).getMaxByteLimit()
+                < request.getPlainText().length) {
                 throw new HuaweicloudException(ErrorMessage.DATA_EXCEED_LIMIT.getMessage());
             }
-            dataKeyMaterials = cryptoMeterialManager.getMaterialsForEncrypt(keyring, dataKeyMaterials, request.getPlainText().length);
+            dataKeyMaterials = cryptoMeterialManager.getMaterialsForEncrypt(keyring, dataKeyMaterials,
+                request.getPlainText().length);
             return cryptoHandler.encrypt(request, dataKeyMaterials);
         } catch (Exception e) {
             throw new HuaweicloudException(ErrorMessage.CIPHER_EXCEPTION.getMessage(), e);
 
         }
     }
-
 
     public CryptoResult<byte[]> decrypt(byte[] cipherText) {
         if (keyring == null) {
@@ -93,8 +98,8 @@ public class HuaweiCrypto {
         }
     }
 
-
-    public CryptoResult<OutputStream> encrypt(InputStream inputStream, OutputStream outputStream, Map<String, String> encryptionContext) {
+    public CryptoResult<OutputStream> encrypt(InputStream inputStream, OutputStream outputStream,
+        Map<String, String> encryptionContext) {
         if (keyring == null) {
             throw new KeyringNotFoundException(ErrorMessage.KEYRING_NULL_EXCEPTION.getMessage());
         }
@@ -102,18 +107,20 @@ public class HuaweiCrypto {
         DataKeyMaterials dataKeyMaterials = null;
         try {
             dataKeyMaterials = new DataKeyMaterials();
-            dataKeyMaterials.setEncryptionContexts(encryptionContext == null ? Collections.emptyMap() : encryptionContext);
+            dataKeyMaterials.setEncryptionContexts(
+                encryptionContext == null ? Collections.emptyMap() : encryptionContext);
             dataKeyMaterials.setCryptoAlgorithm(huaweiConfig.getCryptoAlgorithm());
-            if (cryptoMeterialManager instanceof CacheCryptoMeterialManager && ((CacheCryptoMeterialManager) cryptoMeterialManager).getMaxByteLimit() < inputStream.available()) {
+            if (cryptoMeterialManager instanceof CacheCryptoMeterialManager
+                && ((CacheCryptoMeterialManager) cryptoMeterialManager).getMaxByteLimit() < inputStream.available()) {
                 throw new HuaweicloudException(ErrorMessage.DATA_EXCEED_LIMIT.getMessage());
             }
-            dataKeyMaterials = cryptoMeterialManager.getMaterialsForEncrypt(keyring, dataKeyMaterials, inputStream.available());
+            dataKeyMaterials = cryptoMeterialManager.getMaterialsForEncrypt(keyring, dataKeyMaterials,
+                inputStream.available());
             return cryptoHandler.encrypt(inputStream, outputStream, dataKeyMaterials, encryptionContext);
         } catch (Exception e) {
             throw new HuaweicloudException(ErrorMessage.CIPHER_EXCEPTION.getMessage(), e);
         }
     }
-
 
     public CryptoResult<OutputStream> decrypt(InputStream inputStream, OutputStream outputStream) {
         if (keyring == null) {
@@ -127,6 +134,5 @@ public class HuaweiCrypto {
             throw new HuaweicloudException(ErrorMessage.DECRYPT_EXCEPTION.getMessage(), e);
         }
     }
-
 
 }

@@ -7,9 +7,10 @@ public enum DataKeyGenerateType {
     LOCAL_GENERATE("create data key from local", 1),
     KMS_GENERATE("create data key from KMS", 2),
     ;
-    private String desc;
-    private int code;
 
+    private String desc;
+
+    private int code;
 
     DataKeyGenerateType(String desc, int code) {
         this.desc = desc;

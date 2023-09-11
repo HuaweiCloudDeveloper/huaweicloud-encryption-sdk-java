@@ -14,7 +14,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * KeyringFactoryTest
+ * @author zc
+ * @ClassName KeyringFactoryTest
+ * @description:
+ * @datetime 2022年 09月 08日 14:28
  */
 public class KeyringFactoryTest {
 
@@ -33,7 +36,6 @@ public class KeyringFactoryTest {
         sM2.setPublicKey("sdfs".getBytes(StandardCharsets.UTF_8));
         Assert.assertEquals("sdfs", new String(sM2.getPublicKey().get(0)));
     }
-
 
     @Test(expected = KeyringNotFoundException.class)
     public void Should_Exception_When_NoKeyringTest() throws DecoderException, NoSuchAlgorithmException, IOException {
