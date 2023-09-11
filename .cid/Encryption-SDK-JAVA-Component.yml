@@ -27,6 +27,6 @@ artifacts:
   java_deploy:
     - pom_path: ./pom.xml
       packages:
-        - path: ./target/huaweicloud-encryption-sdk-java-1.0.20.jar
+        - path: ./target/huaweicloud-encryption-sdk-java-1.0.21.jar
           packaging: jar
 #pipelineYaml: repackage
