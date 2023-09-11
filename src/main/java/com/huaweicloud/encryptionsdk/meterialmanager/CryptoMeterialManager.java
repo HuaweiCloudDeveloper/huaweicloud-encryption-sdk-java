@@ -4,7 +4,6 @@ import com.huaweicloud.encryptionsdk.keyrings.Keyring;
 import com.huaweicloud.encryptionsdk.model.DataKeyMaterials;
 import org.apache.commons.codec.DecoderException;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
@@ -16,8 +15,8 @@ import java.util.concurrent.ExecutionException;
 
 public interface CryptoMeterialManager {
 
-
-    DataKeyMaterials getMaterialsForEncrypt(Keyring keyring, DataKeyMaterials dataKeyMaterials, long plaintTextLength) throws NoSuchAlgorithmException, IOException, DecoderException, ExecutionException, InterruptedException;
+    DataKeyMaterials getMaterialsForEncrypt(Keyring keyring, DataKeyMaterials dataKeyMaterials, long plaintTextLength)
+        throws NoSuchAlgorithmException, IOException, DecoderException, ExecutionException, InterruptedException;
 
     DataKeyMaterials getMaterialsForDecrypt(Keyring keyring, byte[] cipherText) throws IOException;
 

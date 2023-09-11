@@ -11,6 +11,7 @@ public enum KeyringTypeEnum {
     RAW_SM4_GCN("SM4_GCM"),
     KMS_MULTI_REGION("multi"),
     KMS_DISCOVERY("discovery");
+
     private String type;
 
     KeyringTypeEnum(String type) {

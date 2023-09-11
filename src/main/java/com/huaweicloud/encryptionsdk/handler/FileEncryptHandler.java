@@ -19,15 +19,14 @@ public class FileEncryptHandler {
 
     private SecretKey secretKey;
 
-
     public FileEncryptHandler(CryptoAlgorithm algorithm, SecretKey secretKey, int mode) {
         this.mode = mode;
         this.algorithm = algorithm;
         this.secretKey = secretKey;
     }
 
-
-    public void processByte(InputStream inputStream, OutputStream outputStream, Map<String, String> encryptionContext, int blockSize) throws IOException {
+    public void processByte(InputStream inputStream, OutputStream outputStream, Map<String, String> encryptionContext,
+        int blockSize) throws IOException {
         byte[] readBytes = new byte[blockSize];
         int readLen = 0;
         CipherHandler cipherHandler = new CipherHandler(algorithm, secretKey, mode);

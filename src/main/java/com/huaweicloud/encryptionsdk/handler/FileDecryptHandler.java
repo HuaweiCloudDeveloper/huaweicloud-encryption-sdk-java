@@ -22,7 +22,7 @@ public class FileDecryptHandler {
     private CryptoAlgorithm algorithm;
 
     private SecretKey secretKey;
-    
+
     /**
      * 未解析的byte数组
      */
@@ -30,14 +30,12 @@ public class FileDecryptHandler {
 
     private CipherHeader header;
 
-
     public FileDecryptHandler(CryptoAlgorithm algorithm, SecretKey secretKey, int mode) {
         this.mode = mode;
         this.algorithm = algorithm;
         this.secretKey = secretKey;
         this.unParsedByte = new byte[0];
     }
-
 
     /**
      * @return void
@@ -52,7 +50,8 @@ public class FileDecryptHandler {
      * encryptionContext：加密上下文
      * blockSize：每次读取流中数据块大小
      **/
-    public void processByte(InputStream inputStream, OutputStream outputStream, Map<String, String> encryptionContext, int blockSize) throws IOException {
+    public void processByte(InputStream inputStream, OutputStream outputStream, Map<String, String> encryptionContext,
+        int blockSize) throws IOException {
         try {
             byte[] readBytes = new byte[blockSize];
             int readLen = 0;
@@ -83,9 +82,12 @@ public class FileDecryptHandler {
                         unParsedByte = Arrays.copyOfRange(bytesToParse, fileHeaderLength, unParsedByteTotal);
                         continue;
                     }
-                    cipherText = Arrays.copyOfRange(bytesToParse, fileHeaderLength, fileHeaderLength + cipherHeader.getContentLength());
-                    if (cipherHeader.getContentLength() <= unParsedByteTotal - cipherHeader.getFileHeaderLength(algorithm)) {
-                        unParsedByte = Arrays.copyOfRange(bytesToParse, cipherHeader.getContentLength() + fileHeaderLength, bytesToParse.length);
+                    cipherText = Arrays.copyOfRange(bytesToParse, fileHeaderLength,
+                        fileHeaderLength + cipherHeader.getContentLength());
+                    if (cipherHeader.getContentLength() <= unParsedByteTotal - cipherHeader.getFileHeaderLength(
+                        algorithm)) {
+                        unParsedByte = Arrays.copyOfRange(bytesToParse,
+                            cipherHeader.getContentLength() + fileHeaderLength, bytesToParse.length);
                     }
                 }
                 cipherHandler.setIv(this.header.getIv());

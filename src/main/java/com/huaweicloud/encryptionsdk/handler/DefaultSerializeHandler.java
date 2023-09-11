@@ -16,13 +16,13 @@ import java.nio.ByteBuffer;
  */
 public class DefaultSerializeHandler implements SerializeHandler {
 
-
     @Override
     public byte[] serialize(DataMaterials dataMaterials) {
         CipherBody cipherBody = dataMaterials.getCipherBody();
         byte[] headers = dataMaterials.getHeaders().serializeAuthenticatedFields();
         byte[] headerTag = dataMaterials.getHeaders().getHeaderTag();
-        ByteBuffer result = ByteBuffer.allocate(cipherBody.getTotalLength() + headers.length + Short.SIZE / Byte.SIZE + headerTag.length);
+        ByteBuffer result = ByteBuffer.allocate(
+            cipherBody.getTotalLength() + headers.length + Short.SIZE / Byte.SIZE + headerTag.length);
         result.put(headers);
         result.putShort(dataMaterials.getHeaders().getHeaderTagLength());
         result.put(headerTag);
@@ -33,7 +33,7 @@ public class DefaultSerializeHandler implements SerializeHandler {
     @Override
     public DataMaterials deserialize(byte[] cipherData) {
         try (ByteArrayInputStream outBytes = new ByteArrayInputStream(cipherData);
-             DataInputStream dataStream = new DataInputStream(outBytes)) {
+            DataInputStream dataStream = new DataInputStream(outBytes)) {
             CipherHeader cipherHeader = new CipherHeader().deserializeAuthenticatedFields(dataStream);
             CipherBody cipherBody = null;
             if (dataStream.available() > 0) {
@@ -43,7 +43,6 @@ public class DefaultSerializeHandler implements SerializeHandler {
         } catch (IOException e) {
             throw new HuaweicloudException(ErrorMessage.DESERIALIZE_EXCEPTION.getMessage(), e);
         }
-
 
     }
 

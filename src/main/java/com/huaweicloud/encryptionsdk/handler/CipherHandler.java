@@ -13,7 +13,11 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import java.io.OutputStream;
-import java.security.*;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.Security;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Map;
 
@@ -48,13 +52,13 @@ public class CipherHandler {
         this.mode = mode;
     }
 
-    private static final SecureRandom random;
+    private static final SecureRandom RANDOM;
 
     static {
         try {
-            random = SecureRandom.getInstanceStrong();
+            RANDOM = SecureRandom.getInstanceStrong();
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new HuaweicloudException(e);
         }
         Security.addProvider(new BouncyCastleProvider());
     }
@@ -82,10 +86,9 @@ public class CipherHandler {
 
     private byte[] getIv(CryptoAlgorithm algorithm) {
         byte[] algorithmIv = new byte[algorithm.getIvLen()];
-        random.nextBytes(algorithmIv);
+        RANDOM.nextBytes(algorithmIv);
         return algorithmIv;
     }
-
 
     public void reSetIv() {
         this.iv = getIv(algorithm);
@@ -148,7 +151,6 @@ public class CipherHandler {
         return params;
     }
 
-
     /**
      * @return byte[]
      * @Description ：加密流数据
@@ -158,7 +160,8 @@ public class CipherHandler {
      * outputStream：密文输出流
      * encryptionContext：加密上下文
      **/
-    public byte[] processEncryptByte(byte[] readBytes, int readLen, OutputStream outputStream, Map<String, String> encryptionContext) {
+    public byte[] processEncryptByte(byte[] readBytes, int readLen, OutputStream outputStream,
+        Map<String, String> encryptionContext) {
         try {
             initCipher();
             if (algorithm != CryptoAlgorithm.SM4_128_CBC_PADDING) {
@@ -177,7 +180,6 @@ public class CipherHandler {
         }
     }
 
-
     /**
      * @return byte[]
      * @Description ：解密流数据
@@ -187,7 +189,8 @@ public class CipherHandler {
      * outputStream：明文输出流
      * encryptionContext：加密上下文
      **/
-    public byte[] processDecryptByte(byte[] readBytes, int readLen, OutputStream outputStream, Map<String, String> encryptionContext) {
+    public byte[] processDecryptByte(byte[] readBytes, int readLen, OutputStream outputStream,
+        Map<String, String> encryptionContext) {
         try {
             initCipher();
             if (algorithm != CryptoAlgorithm.SM4_128_CBC_PADDING) {
@@ -200,7 +203,6 @@ public class CipherHandler {
             throw new HuaweicloudException(ErrorMessage.PROCESS_FILE_ERROR.getMessage(), e);
         }
     }
-
 
     private void initCipher() throws InvalidAlgorithmParameterException, InvalidKeyException {
         AlgorithmParameterSpec params = null;

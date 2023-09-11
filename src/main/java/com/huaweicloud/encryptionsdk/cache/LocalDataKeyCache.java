@@ -4,13 +4,13 @@ import com.huaweicloud.encryptionsdk.model.DataKeyMaterials;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 import java.util.TreeSet;
 
 /**
  * @description: 本地缓存
  */
 public class LocalDataKeyCache implements DataKeyCache {
-
 
     /**
      * 数据密钥缓存容量
@@ -31,7 +31,6 @@ public class LocalDataKeyCache implements DataKeyCache {
      * 数据密钥缓存存活时间
      */
     private long keyExpireTime;
-
 
     /**
      * accessOrder为true时，访问和插入都会把元素置位队列尾部，用于实现LRU
@@ -69,13 +68,16 @@ public class LocalDataKeyCache implements DataKeyCache {
 
     @Override
     public void putEntryForEncrypt(String cacheId, DataKeyMaterials dataKeyMaterials, UsageStatus initialUsage) {
-        BaseEntry baseEntry = new BaseEntry(cacheId, keyExpireTime + System.currentTimeMillis(), dataKeyMaterials, initialUsage);
+        BaseEntry baseEntry = new BaseEntry(cacheId, keyExpireTime + System.currentTimeMillis(), dataKeyMaterials,
+            initialUsage);
         putEntry(baseEntry);
     }
 
     @Override
-    public void putEntryForEncrypt(String cacheId, long surviveTime, DataKeyMaterials dataKeyMaterials, UsageStatus initialUsage) {
-        BaseEntry baseEntry = new BaseEntry(cacheId, surviveTime + System.currentTimeMillis(), dataKeyMaterials, initialUsage);
+    public void putEntryForEncrypt(String cacheId, long surviveTime, DataKeyMaterials dataKeyMaterials,
+        UsageStatus initialUsage) {
+        BaseEntry baseEntry = new BaseEntry(cacheId, surviveTime + System.currentTimeMillis(), dataKeyMaterials,
+            initialUsage);
         putEntry(baseEntry);
     }
 
@@ -112,11 +114,13 @@ public class LocalDataKeyCache implements DataKeyCache {
      */
     private class BaseEntry implements Comparable<BaseEntry> {
         private String key;
+
         private long expireTimeStamp;
 
         private long createTimeStamp = System.currentTimeMillis();
 
         private DataKeyMaterials material;
+
         private UsageStatus usageStatus;
 
         private BaseEntry(String key, long expireTime, DataKeyMaterials material, UsageStatus usageStatus) {
@@ -162,8 +166,26 @@ public class LocalDataKeyCache implements DataKeyCache {
             int num = Long.compare(this.expireTimeStamp, o.expireTimeStamp);
             return num == 0 ? Long.compare(this.createTimeStamp, o.createTimeStamp) : num;
         }
-    }
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            BaseEntry baseEntry = (BaseEntry) o;
+            return expireTimeStamp == baseEntry.expireTimeStamp && createTimeStamp == baseEntry.createTimeStamp
+                && Objects.equals(key, baseEntry.key) && Objects.equals(material, baseEntry.material) && Objects.equals(
+                usageStatus, baseEntry.usageStatus);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(key, expireTimeStamp, createTimeStamp, material, usageStatus);
+        }
+    }
 
     /**
      * BaseEntry和usageStatus外部封装，用于加密数据密钥获取的的返回
@@ -202,7 +224,6 @@ public class LocalDataKeyCache implements DataKeyCache {
      */
     private class DecryptionEntry extends BaseEntry implements DecryptCacheEntry {
 
-
         private DecryptionEntry(String key, long expireTime, DataKeyMaterials material, UsageStatus usageStatus) {
             super(key, expireTime, material, usageStatus);
         }
@@ -217,7 +238,6 @@ public class LocalDataKeyCache implements DataKeyCache {
             removeEntry(this);
         }
     }
-
 
     private synchronized void removeEntry(BaseEntry entry) {
         cache.remove(entry.key, entry);
@@ -254,6 +274,5 @@ public class LocalDataKeyCache implements DataKeyCache {
             removeEntry(iterator.next());
         }
     }
-
 
 }

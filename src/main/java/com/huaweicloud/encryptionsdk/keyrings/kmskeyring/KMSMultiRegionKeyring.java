@@ -7,7 +7,6 @@ import com.huaweicloud.encryptionsdk.model.DataKeyMaterials;
  */
 public class KMSMultiRegionKeyring extends KMSKeyring {
 
-
     @Override
     public void doDecrypt(DataKeyMaterials dataKeyMaterials) {
         super.realDecrypt(dataKeyMaterials);

@@ -24,14 +24,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-
 /**
- * CipherHeader
+ * @ClassName CipherHeader
+ * @description:
  */
 public class CipherHeader {
 
     private static final String CACHE_ID_ALGORITHM_SM3 = "SM3";
-
 
     private byte version = Constants.VERSION;
 
@@ -112,7 +111,9 @@ public class CipherHeader {
     public CipherHeader() {
     }
 
-    public CipherHeader(CryptoAlgorithm algorithm, Map<String, String> encryptionContext, List<CiphertextDataKey> ciphertextDataKeys, SecretKey secretKey) throws NoSuchAlgorithmException, NoSuchProviderException {
+    public CipherHeader(CryptoAlgorithm algorithm, Map<String, String> encryptionContext,
+        List<CiphertextDataKey> ciphertextDataKeys, SecretKey secretKey)
+        throws NoSuchAlgorithmException, NoSuchProviderException {
         this.algorithm = algorithm;
         this.algorithmId = algorithm.getValue();
         this.encryptionContext = encryptionContext;
@@ -133,7 +134,8 @@ public class CipherHeader {
             return;
         }
         CipherHandler cipherHandler = new CipherHandler(algorithm, secretKey, Cipher.ENCRYPT_MODE);
-        byte[] headerTagByte = cipherHandler.cipherHeaderData(new byte[0], headerFieldsBytes, Constants.NUM_0, Constants.NUM_0);
+        byte[] headerTagByte = cipherHandler.cipherHeaderData(new byte[0], headerFieldsBytes, Constants.NUM_0,
+            Constants.NUM_0);
         int ivLen = cipherHandler.getIv().length;
         byte[] message = new byte[ivLen + headerTagByte.length];
         System.arraycopy(cipherHandler.getIv(), Constants.NUM_0, message, Constants.NUM_0, ivLen);
@@ -155,7 +157,7 @@ public class CipherHeader {
 
     public byte[] serializeAuthenticatedFields() {
         try (ByteArrayOutputStream outBytes = new ByteArrayOutputStream();
-             DataOutputStream dataStream = new DataOutputStream(outBytes)) {
+            DataOutputStream dataStream = new DataOutputStream(outBytes)) {
             dataStream.writeByte(version);
 
             dataStream.writeShort(algorithmId);
@@ -186,11 +188,15 @@ public class CipherHeader {
                 algorithmId = dataStream.readShort();
                 this.algorithm = CryptoAlgorithm.getAlgorithm(algorithmId);
                 if (this.algorithm == null) {
-                    throw new HuaweicloudException(ErrorMessage.CIPHER_TEXT_CHANGED_ERROR.getMessage() + ",algorithm id is: " + algorithmId);
+                    throw new HuaweicloudException(
+                        ErrorMessage.CIPHER_TEXT_CHANGED_ERROR.getMessage() + ",algorithm id is: " + algorithmId);
                 }
                 encryptionContextByteLength = dataStream.readShort();
                 encryptionContextByte = new byte[encryptionContextByteLength];
-                dataStream.read(encryptionContextByte);
+                int readContext = dataStream.read(encryptionContextByte);
+                if (readContext != encryptionContextByte.length) {
+                    throw new HuaweicloudException(ErrorMessage.SOURCE_FILE_INVALID.getMessage());
+                }
                 this.encryptionContext = Utils.deserializeContext(encryptionContextByte);
 
                 this.cipherDataKeySize = dataStream.readByte();
@@ -210,13 +216,15 @@ public class CipherHeader {
                 ivLength = dataStream.readByte();
                 headerTagLength = dataStream.readShort();
                 headerTag = new byte[headerTagLength];
-                dataStream.read(headerTag);
+                int readHeader = dataStream.read(headerTag);
+                if (readHeader != headerTag.length) {
+                    throw new HuaweicloudException(ErrorMessage.SOURCE_FILE_INVALID.getMessage());
+                }
             }
             return this;
         } catch (Exception e) {
             throw new HuaweicloudException(ErrorMessage.DESERIALIZE_EXCEPTION.getMessage(), e);
         }
-
 
     }
 
@@ -239,7 +247,8 @@ public class CipherHeader {
                 }
                 return;
             }
-            cipherHandler.cipherHeaderData(headerTag, headerFieldsBytes, algorithm.getIvLen(), getHeaderTag().length - algorithm.getIvLen());
+            cipherHandler.cipherHeaderData(headerTag, headerFieldsBytes, algorithm.getIvLen(),
+                getHeaderTag().length - algorithm.getIvLen());
         } catch (Exception e) {
             throw new CipherTamperedException(ErrorMessage.TAMPERED_EXCEPTION.getMessage(), e);
         }
@@ -247,7 +256,7 @@ public class CipherHeader {
 
     public byte[] serializeFileFields() {
         try (ByteArrayOutputStream outBytes = new ByteArrayOutputStream();
-             DataOutputStream dataStream = new DataOutputStream(outBytes)) {
+            DataOutputStream dataStream = new DataOutputStream(outBytes)) {
             dataStream.write(iv);
             dataStream.writeLong(contentLength);
             return outBytes.toByteArray();
@@ -262,6 +271,7 @@ public class CipherHeader {
 
     public void deserializeFileFields(byte[] headerBytes, CryptoAlgorithm algorithm) {
         this.iv = Arrays.copyOfRange(headerBytes, 0, algorithm.getIvLen());
-        this.contentLength = (int) Utils.byteToLong(Arrays.copyOfRange(headerBytes, algorithm.getIvLen(), headerBytes.length));
+        this.contentLength = (int) Utils.byteToLong(
+            Arrays.copyOfRange(headerBytes, algorithm.getIvLen(), headerBytes.length));
     }
 }

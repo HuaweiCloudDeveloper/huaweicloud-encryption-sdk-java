@@ -22,8 +22,8 @@ public class RawRSAKeyring extends RawKeyring {
     private static final Logger LOGGER = LoggerFactory.getLogger(KMSKeyring.class);
 
     public static final String RSA_ALGORITHM = "RSA";
-    private static final String DEFAULT_CIPHER_ALGORITHM = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
 
+    private static final String DEFAULT_CIPHER_ALGORITHM = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
 
     @Override
     public List<byte[]> getEncryptSecretKey() throws FileNotFoundException {
@@ -31,7 +31,8 @@ public class RawRSAKeyring extends RawKeyring {
     }
 
     @Override
-    public void realEncrypt(byte[] bytes, List<CiphertextDataKey> ciphertextDataKeys, DataKeyMaterials dataKeyMaterials) {
+    public void realEncrypt(byte[] bytes, List<CiphertextDataKey> ciphertextDataKeys,
+        DataKeyMaterials dataKeyMaterials) {
         try {
             byte[] encodeDatakey = dataKeyMaterials.getPlaintextDataKey().getEncoded();
             RSAPublicKey publicKey = (RSAPublicKey) Utils.getPublicKey(bytes, RSA_ALGORITHM);
@@ -50,7 +51,8 @@ public class RawRSAKeyring extends RawKeyring {
             Cipher cipher = Cipher.getInstance(DEFAULT_CIPHER_ALGORITHM);
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
             byte[] dataKey = cipher.doFinal(ciphertextDataKey.getDataKey());
-            dataKeyMaterials.setPlaintextDataKey(Utils.byteToSecretKey(dataKey, dataKeyMaterials.getCryptoAlgorithm().getAlgorithmName()));
+            dataKeyMaterials.setPlaintextDataKey(
+                Utils.byteToSecretKey(dataKey, dataKeyMaterials.getCryptoAlgorithm().getAlgorithmName()));
             return true;
         } catch (Exception e) {
             LOGGER.warn("one master key may be not match when decrypt data key in RawRSAKeyring.class");

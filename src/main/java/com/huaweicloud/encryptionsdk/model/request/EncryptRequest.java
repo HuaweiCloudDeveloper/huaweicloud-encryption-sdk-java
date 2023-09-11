@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class EncryptRequest {
     private Map<String, String> encryptionContext;
+
     private byte[] plainText;
 
     public EncryptRequest(Map<String, String> encryptionContext, byte[] plainText) {

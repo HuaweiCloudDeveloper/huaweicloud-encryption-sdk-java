@@ -6,7 +6,9 @@ package com.huaweicloud.encryptionsdk.model.enums;
 public enum KeyProviderEnum {
     LOCAL_PROVIDER(1, "huawei-local"),
     KMS_PROVIDER(2, "huawei-kms");
+
     private int code;
+
     private String name;
 
     KeyProviderEnum(int code, String name) {

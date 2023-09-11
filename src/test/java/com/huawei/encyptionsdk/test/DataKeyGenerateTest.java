@@ -15,38 +15,42 @@ import java.util.Base64;
 import java.util.Collections;
 
 /**
- * DataKeyGenerateTest
+ * @author zc
+ * @ClassName DataKeyGenerateTest
+ * @description:
+ * @datetime 2022年 09月 19日 14:14
  */
 public class DataKeyGenerateTest {
     private static final String ACCESS_KEY = "WN0ETTDULCBZDCPDMBR8";
+
     private static final String SECRET_ACCESS_KEY = "M7dOePlpneNQmKSVSAIV6Vp2zNtwfoGM3Lf4QIod";
+
     private static final String PROJECT_ID = "7c55d8e5238d42e49fd9ce11b24b035b";
+
     private static final String REGION = "cn-north-7";
+
     private static final String KEYID = "c1f52e49-8e5c-4772-8713-ead33ed9faa2";
-
-
 
     @Test
     public void Should_ok_When_LocalGenerate() throws NoSuchAlgorithmException {
         DataKeyGenerate dataKeyGenerate = DataKeyGenerateFactory.getDataKeyGenerate(DataKeyGenerateType.LOCAL_GENERATE);
         HuaweiConfig huaweiConfig = HuaweiConfig.builder()
-                .buildCryptoAlgorithm(CryptoAlgorithm.AES_256_GCM_NOPADDING)
-                .build();
+            .cryptoAlgorithm(CryptoAlgorithm.AES_256_GCM_NOPADDING)
+            .build();
         DataKeyMaterials dataKeyMaterials = new DataKeyMaterials();
         dataKeyGenerate.dataKeyGenerate(huaweiConfig, dataKeyMaterials);
         System.out.println(Base64.getEncoder().encodeToString(dataKeyMaterials.getPlaintextDataKey().getEncoded()));
     }
 
-
     @Test(expected = HuaweicloudException.class)
     public void Should_ok_When_KMSGenerate() throws NoSuchAlgorithmException {
         DataKeyGenerate dataKeyGenerate = DataKeyGenerateFactory.getDataKeyGenerate(DataKeyGenerateType.KMS_GENERATE);
         HuaweiConfig huaweiConfig = HuaweiConfig.builder()
-                .buildSk(SECRET_ACCESS_KEY)
-                .buildAk(ACCESS_KEY)
-                .buildKmsConfig(Collections.singletonList(new KMSConfig(REGION, KEYID, PROJECT_ID)))
-                .buildCryptoAlgorithm(CryptoAlgorithm.AES_256_GCM_NOPADDING)
-                .build();
+            .sk(SECRET_ACCESS_KEY)
+            .ak(ACCESS_KEY)
+            .kmsConfigList(Collections.singletonList(new KMSConfig(REGION, KEYID, PROJECT_ID)))
+            .cryptoAlgorithm(CryptoAlgorithm.AES_256_GCM_NOPADDING)
+            .build();
         DataKeyMaterials dataKeyMaterials = new DataKeyMaterials();
         dataKeyGenerate.dataKeyGenerate(huaweiConfig, dataKeyMaterials);
         System.out.println(Base64.getEncoder().encodeToString(dataKeyMaterials.getPlaintextDataKey().getEncoded()));

@@ -1,6 +1,5 @@
 package com.huaweicloud.encryptionsdk.exception;
 
-
 public class KeyringNotMatchException extends HuaweicloudException {
 
     public KeyringNotMatchException() {
@@ -10,6 +9,5 @@ public class KeyringNotMatchException extends HuaweicloudException {
     public KeyringNotMatchException(final String message) {
         super(message);
     }
-
 
 }

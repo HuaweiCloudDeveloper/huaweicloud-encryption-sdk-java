@@ -1,5 +1,6 @@
 package com.huawei.encyptionsdk.test.keyringtest;
 
+import com.huaweicloud.encryptionsdk.common.FilePathForExampleConstants;
 import com.huaweicloud.encryptionsdk.common.Utils;
 import com.huaweicloud.encryptionsdk.keyrings.RawKeyringFactory;
 import com.huaweicloud.encryptionsdk.keyrings.rawkeyring.RawKeyring;
@@ -22,11 +23,16 @@ import java.util.Base64;
 import java.util.Collections;
 
 /**
- * RawAesKeyringTest
+ * @author zc
+ * @ClassName RawAesKeyringTest
+ * @description:
+ * @datetime 2022年 09月 08日 16:23
  */
 public class RawSm2KeyringTest {
     @Test
-    public void Should_ok_When_StateUnderSM2EncryptTest() throws IOException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, InvalidCipherTextException {
+    public void Should_ok_When_StateUnderSM2EncryptTest()
+        throws IOException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException,
+        BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, InvalidCipherTextException {
         RawKeyringFactory rawKeyringFactory = new RawKeyringFactory();
         RawKeyring sm2 = rawKeyringFactory.getKeyring("sm2");
         String dataKey = "5sFKOkwE2lRAIASXm3QFNoNRX1GbEKYgVZHmOdi7smU=";
@@ -34,10 +40,11 @@ public class RawSm2KeyringTest {
         dataKeyMaterials.setCryptoAlgorithm(CryptoAlgorithm.SM4_128_GCM_NOPADDING);
         byte[] decode = Base64.getDecoder().decode(dataKey);
         dataKeyMaterials.setPlaintextDataKey(new SecretKeySpec(decode, 0, decode.length, "AES"));
-        sm2.setPrivateKey(Utils.readMasterKey(Collections.singletonList("src/test/resources/pri.txt")));
-        sm2.setPublicKey(Utils.readMasterKey(Collections.singletonList("src/test/resources/pub.txt")));
+        sm2.setPrivateKey(Utils.readMasterKey(Collections.singletonList(FilePathForExampleConstants.PRI_FILE_PATH)));
+        sm2.setPublicKey(Utils.readMasterKey(Collections.singletonList(FilePathForExampleConstants.PUB_FILE_PATH)));
         sm2.encryptDataKey(dataKeyMaterials);
-        System.out.println(Base64.getEncoder().encodeToString(dataKeyMaterials.getCiphertextDataKeys().get(0).getDataKey()));
+        System.out.println(
+            Base64.getEncoder().encodeToString(dataKeyMaterials.getCiphertextDataKeys().get(0).getDataKey()));
         dataKeyMaterials.setPlaintextDataKey(null);
         sm2.decryptDataKey(dataKeyMaterials);
         SecretKey plaintextDataKey = dataKeyMaterials.getPlaintextDataKey();

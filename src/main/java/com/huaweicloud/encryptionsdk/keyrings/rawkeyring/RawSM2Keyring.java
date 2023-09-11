@@ -19,7 +19,6 @@ import org.bouncycastle.math.ec.ECPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import javax.crypto.SecretKey;
 import java.math.BigInteger;
 import java.util.List;
@@ -32,9 +31,9 @@ public class RawSM2Keyring extends RawKeyring {
 
     private static final String KEY_ALGORITHM = "EC";
 
-
     @Override
-    public void realEncrypt(byte[] bytes, List<CiphertextDataKey> ciphertextDataKeys, DataKeyMaterials dataKeyMaterials) {
+    public void realEncrypt(byte[] bytes, List<CiphertextDataKey> ciphertextDataKeys,
+        DataKeyMaterials dataKeyMaterials) {
         try {
             SecretKey plaintextDataKey = dataKeyMaterials.getPlaintextDataKey();
             byte[] encodeDatakey = plaintextDataKey.getEncoded();
@@ -51,11 +50,14 @@ public class RawSM2Keyring extends RawKeyring {
     @Override
     public boolean realDecrypt(byte[] bytes, CiphertextDataKey ciphertextDataKey, DataKeyMaterials dataKeyMaterials) {
         try {
-            ECPrivateKeyParameters privateKeyParameters = getPrivateKeyParameters((ECPrivateKey) Utils.getPrivateKey(bytes, KEY_ALGORITHM));
+            ECPrivateKeyParameters privateKeyParameters = getPrivateKeyParameters(
+                (ECPrivateKey) Utils.getPrivateKey(bytes, KEY_ALGORITHM));
             SM2Engine sm2Engine = new SM2Engine();
             sm2Engine.init(false, privateKeyParameters);
-            byte[] dataKey = sm2Engine.processBlock(ciphertextDataKey.getDataKey(), 0, ciphertextDataKey.getDataKey().length);
-            dataKeyMaterials.setPlaintextDataKey(Utils.byteToSecretKey(dataKey, dataKeyMaterials.getCryptoAlgorithm().getAlgorithmName()));
+            byte[] dataKey = sm2Engine.processBlock(ciphertextDataKey.getDataKey(), 0,
+                ciphertextDataKey.getDataKey().length);
+            dataKeyMaterials.setPlaintextDataKey(
+                Utils.byteToSecretKey(dataKey, dataKeyMaterials.getCryptoAlgorithm().getAlgorithmName()));
             return true;
         } catch (Exception e) {
             LOGGER.warn("one master key may be not match when decrypt data key in RawSM2Keyring.class");
@@ -63,11 +65,11 @@ public class RawSM2Keyring extends RawKeyring {
         return false;
     }
 
-
     private ECPublicKeyParameters getPublicKeyParam(byte[] bytes) {
         ECPublicKey publicKey = (ECPublicKey) Utils.getPublicKey(bytes, KEY_ALGORITHM);
         ECParameterSpec parameterSpec = publicKey.getParameters();
-        ECDomainParameters domainParams = new ECDomainParameters(parameterSpec.getCurve(), parameterSpec.getG(), parameterSpec.getN(), parameterSpec.getH());
+        ECDomainParameters domainParams = new ECDomainParameters(parameterSpec.getCurve(), parameterSpec.getG(),
+            parameterSpec.getN(), parameterSpec.getH());
         return new ECPublicKeyParameters(publicKey.getQ(), domainParams);
     }
 
@@ -86,11 +88,9 @@ public class RawSM2Keyring extends RawKeyring {
         return getPublicKey();
     }
 
-
     @Override
     public List<byte[]> getDecryptSecretKey() {
         return getPrivateKey();
     }
-
 
 }

@@ -1,13 +1,18 @@
 package com.huaweicloud.encryptionsdk.model;
 
 import com.huaweicloud.encryptionsdk.common.Utils;
+import com.huaweicloud.encryptionsdk.exception.ErrorMessage;
+import com.huaweicloud.encryptionsdk.exception.HuaweicloudException;
 import com.huaweicloud.encryptionsdk.model.enums.CryptoAlgorithm;
 
 import java.io.DataInputStream;
 import java.io.IOException;
 
 /**
- * CipherBody
+ * @author zc
+ * @ClassName CipherBody
+ * @description:
+ * @datetime 2022年 09月 22日 15:29
  */
 public class CipherBody {
 
@@ -79,21 +84,32 @@ public class CipherBody {
         return bytes;
     }
 
-
     public CipherBody deserialize(DataInputStream dataStream, CryptoAlgorithm algorithm) throws IOException {
         iv = new byte[algorithm.getIvLen()];
-        dataStream.read(iv);
+        int readIv = dataStream.read(iv);
+        if (readIv != iv.length) {
+            throw new HuaweicloudException(ErrorMessage.SOURCE_FILE_INVALID.getMessage());
+        }
         byte[] encryptedContentLengthBytes = new byte[Long.SIZE / Byte.SIZE];
-        dataStream.read(encryptedContentLengthBytes);
+        int read = dataStream.read(encryptedContentLengthBytes);
+        if (read != encryptedContentLengthBytes.length) {
+            throw new HuaweicloudException(ErrorMessage.SOURCE_FILE_INVALID.getMessage());
+        }
         encryptedContentLength = Utils.byteToLong(encryptedContentLengthBytes);
         encryptedContent = new byte[(int) encryptedContentLength];
-        dataStream.read(encryptedContent);
+        int readContent = dataStream.read(encryptedContent);
+        if (readContent != encryptedContent.length) {
+            throw new HuaweicloudException(ErrorMessage.SOURCE_FILE_INVALID.getMessage());
+        }
         if (algorithm != CryptoAlgorithm.SM4_128_CBC_PADDING) {
             authTag = new byte[algorithm.getTagLen()];
         } else {
             authTag = new byte[0];
         }
-        dataStream.read(authTag);
+        int readAuthTag = dataStream.read(authTag);
+        if (readAuthTag != authTag.length) {
+            throw new HuaweicloudException(ErrorMessage.SOURCE_FILE_INVALID.getMessage());
+        }
         return this;
     }
 }
